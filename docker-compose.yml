@@ -17,6 +17,8 @@ services:
       PORT_DB: 5432
       DATABASE_NAME: db_security
       SCHEMA_DB: data
+      CONFIG_SERVER: configserver:http://localhost:8888
+      
 
     networks:
       - spring
