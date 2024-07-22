@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  mcsv-security-server:
+    container_name: mcsv-security-server
+    image: security-server:1.0.1
+    # build:
+    #   context: ./
+    #   dockerfile: ./eureka-server/Dockerfile
+    ports:
+      - '9001:9001'
+    environment:
+      EUREKA_SERVER: "http://mcsv-eureka-server:8761/eureka"
+      JAVA_OPTS: "-Dspring.profiles.active=mcsv-developer"
+
+      POSTGRES_PASSWORD: developer
+      HOST_DB: 142.93.13.2
+      PORT_DB: 5432
+      DATABASE_NAME: db_security
+      SCHEMA_DB: data
+
+    networks:
+      - spring
+    restart: always
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '1.0'
+    #       memory:  150M
+    #     reservations:
+    #       cpus: '0.5'
+    #       memory: 100M
+
+
+networks:
+  spring:
+    external: true
+    name: spring
