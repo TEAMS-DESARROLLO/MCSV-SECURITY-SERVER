@@ -36,6 +36,8 @@ public class WebSecurityConfig  {
                     authorize -> 
                         authorize
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/user/**").permitAll()
+                        .requestMatchers("/role/**").permitAll()
                         .anyRequest().authenticated()
                 );
     
