@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iat.security.dto.UserRequestDto;
+import com.iat.security.dto.UsuarioDto;
 import com.iat.security.model.Rol;
 import com.iat.security.model.Usuario;
 import com.iat.security.service.IUserService;
@@ -17,6 +18,9 @@ import com.iat.security.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 
 @RestController
@@ -38,7 +42,12 @@ public class UsuarioController {
     }
     
     @GetMapping("/findPaginado")
-    public Page<Usuario> findAll(Pageable pageable) {
+    public Page<UsuarioDto> findAll(Pageable pageable) {
         return userService.findPaginado(pageable);
+    }
+
+    @PutMapping("update/{id}")
+    public Usuario update(@PathVariable Long id, @RequestBody UserRequestDto entity) {
+        return userService.update(id, entity);
     }
 }

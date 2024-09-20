@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,8 @@ import com.iat.security.model.Usuario;
 import com.iat.security.service.IRolService;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.PutMapping;
+
 
 
 @RestController
@@ -40,5 +43,15 @@ public class RolController {
     @GetMapping("/findPaginado")
     public Page<Rol> findAll(Pageable pageable) {
         return rolService.findPaginado(pageable);
+    }
+
+    @GetMapping("/findById/{id}")
+    public Rol findById(@PathVariable Long id) {
+        return rolService.findById(id);
+    }
+
+    @PutMapping("update/{id}")
+    public Rol putMethodName(@PathVariable Long id, @RequestBody RolRequestDto entity) {
+        return rolService.update(id, entity);
     }
 }

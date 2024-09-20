@@ -43,4 +43,19 @@ public class RolServiceImpl implements IRolService {
         return repository.findAll(pageable);
     }
 
+    @Override
+    public Rol update(Long id, RolRequestDto request) {
+        // TODO Auto-generated method stub
+
+        Rol rol = repository.findById(id).orElse(null);
+        if (rol == null) {
+            return null;
+        }else {
+            rol.setNombre(request.getNombre());
+            rol.setDescripcion(request.getDescripcion());
+            return repository.save(rol);
+        }
+        
+    }
+
 }

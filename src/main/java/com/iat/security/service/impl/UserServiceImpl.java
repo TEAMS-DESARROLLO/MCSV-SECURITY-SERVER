@@ -1,17 +1,21 @@
 package com.iat.security.service.impl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.iat.security.dto.UserRequestDto;
+import com.iat.security.dto.UsuarioDto;
 import com.iat.security.model.Rol;
 import com.iat.security.model.Usuario;
 import com.iat.security.model.UsuarioRol;
@@ -30,7 +34,6 @@ import lombok.RequiredArgsConstructor;
 public class UserServiceImpl implements IUserService {
 
     private final IUsuarioRepository iUsuarioRepository;
-    
 
     @Autowired
     private IUsuarioRepository repository;
@@ -40,6 +43,11 @@ public class UserServiceImpl implements IUserService {
       
     @Autowired
     private IUsuarioRolRepository usuarioRolRepository;
+
+    @Autowired
+    @Lazy
+    private PasswordEncoder passwordEncoder;
+
 
     @Override
     public UserDetailsService userDetailsService() {
@@ -67,7 +75,7 @@ public class UserServiceImpl implements IUserService {
         usuario.setUsername(request.getUsername());
         usuario.setNombres(request.getNombres());
         usuario.setRole(Role.ADMIN);
-        usuario.setPassword(request.getPassword());
+        usuario.setPassword(passwordEncoder.encode(request.getPassword()));
         usuario = repository.save(usuario);
 
         List<UsuarioRol>usuarioRolList =  new ArrayList<>();
@@ -81,15 +89,48 @@ public class UserServiceImpl implements IUserService {
 
         usuarioRolRepository.saveAll(usuarioRolList);
         usuario.setRoles(usuarioRolList);
-
-
-
         return usuario;
     }
 
     @Override
-    public Page<Usuario> findPaginado(Pageable pageable) {
-        return repository.findAll(pageable);
+    public Page<UsuarioDto> findPaginado(Pageable pageable) {
+        Page<Usuario> usuarios = repository.findAll(pageable);
+        return usuarios.map(this::convertToDto);
+    }
+
+    private UsuarioDto convertToDto(Usuario usuario) {
+        return UsuarioDto.builder()
+                .idUsuario(usuario.getIdUsuario())
+                .username(usuario.getUsername())
+                .nombres(usuario.getNombres())
+                .role(usuario.getRole())
+                .roles(usuario.getRoles().stream()  
+                   .map(UsuarioRol::getRol)  
+                   .collect(Collectors.toList())) 
+                .build();
+    }
+
+    @Override
+    public Usuario update(Long id, UserRequestDto request) {
+        Usuario usuario = repository.findById(id).orElse(null);
+        if (usuario == null) {
+            throw new UnsupportedOperationException("Usuario no registrado");
+        }else {
+            usuario.setUsername(request.getUsername());
+            usuario.setNombres(request.getNombres());
+            usuario.setPassword(passwordEncoder.encode(request.getPassword()));
+
+
+            List<UsuarioRol>usuarioRolList =  new ArrayList<>();
+            for (Long rolId : request.getRoles()) {
+                Rol rol = rolService.findById(rolId);
+                UsuarioRol usuarioRol = new UsuarioRol();
+                usuarioRol.setUsuario(usuario);
+                usuarioRol.setRol(rol);
+                usuarioRolList.add(usuarioRol);
+            }
+            return repository.save(usuario);
+        }
     }
     
 }

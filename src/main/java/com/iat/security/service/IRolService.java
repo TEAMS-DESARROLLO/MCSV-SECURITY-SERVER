@@ -13,4 +13,5 @@ public interface IRolService {
     Rol findById(Long id);
     Rol save(RolRequestDto request);
     Page<Rol> findPaginado(Pageable pageable);
+    Rol update(Long id, RolRequestDto request);
 }
