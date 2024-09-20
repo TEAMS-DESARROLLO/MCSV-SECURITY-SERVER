@@ -1,9 +1,7 @@
 package com.iat.security.service.impl;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.ArrayList;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
@@ -13,19 +11,16 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import com.iat.security.dto.UserRequestDto;
 import com.iat.security.dto.UsuarioDto;
 import com.iat.security.model.Rol;
 import com.iat.security.model.Usuario;
 import com.iat.security.model.UsuarioRol;
-import com.iat.security.repository.IRolRepository;
 import com.iat.security.repository.IUsuarioRepository;
 import com.iat.security.repository.IUsuarioRolRepository;
 import com.iat.security.service.IRolService;
 import com.iat.security.service.IUserService;
 import com.iat.security.service.Role;
-
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -35,17 +30,12 @@ public class UserServiceImpl implements IUserService {
 
     private final IUsuarioRepository iUsuarioRepository;
 
-    @Autowired
-    private IUsuarioRepository repository;
-
-    @Autowired
-    private IRolService rolService; 
+    private final IRolService rolService; 
       
-    @Autowired
-    private IUsuarioRolRepository usuarioRolRepository;
+    private final IUsuarioRolRepository usuarioRolRepository;
 
-    @Autowired
     @Lazy
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
 
@@ -63,7 +53,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public List<Usuario> findAll() {
-        List<Usuario> usuarios = repository.findAll();
+        List<Usuario> usuarios = iUsuarioRepository.findAll();
         return usuarios;
     }
 
@@ -76,7 +66,7 @@ public class UserServiceImpl implements IUserService {
         usuario.setNombres(request.getNombres());
         usuario.setRole(Role.ADMIN);
         usuario.setPassword(passwordEncoder.encode(request.getPassword()));
-        usuario = repository.save(usuario);
+        usuario = iUsuarioRepository.save(usuario);
 
         List<UsuarioRol>usuarioRolList =  new ArrayList<>();
         for (Long rolId : request.getRoles()) {
@@ -88,13 +78,13 @@ public class UserServiceImpl implements IUserService {
         }
 
         usuarioRolRepository.saveAll(usuarioRolList);
-        usuario.setRoles(usuarioRolList);
+        //usuario.setRoles(usuarioRolList);
         return usuario;
     }
 
     @Override
     public Page<UsuarioDto> findPaginado(Pageable pageable) {
-        Page<Usuario> usuarios = repository.findAll(pageable);
+        Page<Usuario> usuarios = iUsuarioRepository.findAll(pageable);
         return usuarios.map(this::convertToDto);
     }
 
@@ -103,16 +93,12 @@ public class UserServiceImpl implements IUserService {
                 .idUsuario(usuario.getIdUsuario())
                 .username(usuario.getUsername())
                 .nombres(usuario.getNombres())
-                .role(usuario.getRole())
-                .roles(usuario.getRoles().stream()  
-                   .map(UsuarioRol::getRol)  
-                   .collect(Collectors.toList())) 
                 .build();
     }
 
     @Override
     public Usuario update(Long id, UserRequestDto request) {
-        Usuario usuario = repository.findById(id).orElse(null);
+        Usuario usuario = iUsuarioRepository.findById(id).orElse(null);
         if (usuario == null) {
             throw new UnsupportedOperationException("Usuario no registrado");
         }else {
@@ -129,7 +115,7 @@ public class UserServiceImpl implements IUserService {
                 usuarioRol.setRol(rol);
                 usuarioRolList.add(usuarioRol);
             }
-            return repository.save(usuario);
+            return iUsuarioRepository.save(usuario);
         }
     }
     

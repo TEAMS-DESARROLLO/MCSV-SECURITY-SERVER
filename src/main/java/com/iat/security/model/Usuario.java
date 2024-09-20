@@ -42,8 +42,8 @@ public class Usuario implements UserDetails {
     @Enumerated(EnumType.STRING) 
     Role role;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UsuarioRol> roles;
+    /*@OneToMany(fetch = FetchType.EAGER, mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UsuarioRol> roles;*/
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
