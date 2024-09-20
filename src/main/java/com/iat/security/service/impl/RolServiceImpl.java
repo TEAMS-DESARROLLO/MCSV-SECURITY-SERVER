@@ -1,61 +1,67 @@
 package com.iat.security.service.impl;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.iat.security.dto.RolRequestDto;
 import com.iat.security.model.Rol;
-import com.iat.security.repository.IRolRepository;
+import com.iat.security.repository.IGenericRepository;
 import com.iat.security.service.IRolService;
+
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
-public class RolServiceImpl implements IRolService {
+public class RolServiceImpl  extends CRUDImpl<Rol,Long> implements IRolService {
+    
+    private final IGenericRepository<Rol,Long> repository;
+   
 
     @Override
-    public Rol findById(Long id) {
-        return repository.findById(id).orElse(null);
+    protected IGenericRepository<Rol, Long> getRepositorio() {
+        return repository;
+    }
+
+    
+    
+   /* @Override
+    public RolResponseDto findById(Long id) {
+        return UtilMapper.convertRolToRolResponseDto(repository.findById(id).orElse(null));   
     }
 
     @Autowired
     private IRolRepository repository;
 
     @Override
-    public List<Rol> findAll() {
-        return repository.findAll();
+    public List<RolResponseDto> findAll() {
+        return UtilMapper.convertListRolToListRolResponseDto(repository.findAll());
     }
 
     @Override
-    public Rol save(RolRequestDto request) {
-        Rol rol = new Rol();
-        rol.setNombre(request.getNombre());
-        rol.setDescripcion(request.getDescripcion());
-        return repository.save(rol);
+    public RolResponseDto save(RolRequestDto rolRequestDto) {
+        return UtilMapper.convertRolToRolResponseDto(
+                                        repository.save(
+                                            UtilMapper.convertRolRequestDtoToRol(rolRequestDto)));
     }
 
     @Override
-    public Page<Rol> findPaginado(Pageable pageable) {
-        return repository.findAll(pageable);
+    public Page<RolResponseDto> findPaginado(Pageable pageable) {
+       // return repository.findAll(pageable);
+        return null;
     }
 
     @Override
-    public Rol update(Long id, RolRequestDto request) {
-        // TODO Auto-generated method stub
+    public RolResponseDto update(Long id, RolRequestDto request) {
+       
+       RolResponseDto rolResponseDto = this.findById(id);
 
-        Rol rol = repository.findById(id).orElse(null);
-        if (rol == null) {
-            return null;
-        }else {
-            rol.setNombre(request.getNombre());
-            rol.setDescripcion(request.getDescripcion());
-            return repository.save(rol);
-        }
+       if(rolResponseDto!=null){
+
+            return UtilMapper.convertRolToRolResponseDto(
+                repository.save(
+                    UtilMapper.convertRolRequestDtoToRol(request)));
         
+        }
+       
+        return null;
     }
-
+*/
 }
