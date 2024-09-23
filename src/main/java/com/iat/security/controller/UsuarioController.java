@@ -17,7 +17,9 @@ import com.iat.security.dto.UsuarioDto;
 import com.iat.security.model.Rol;
 import com.iat.security.model.Usuario;
 import com.iat.security.service.IUserService;
+import com.iat.security.service.UserBusinessService;
 import com.iat.security.service.impl.UsuarioPaginationService;
+import com.iat.security.util.UtilMapper;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,30 +35,31 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class UsuarioController {
 
     @Autowired
-    private IUserService userService;
+    private UserBusinessService userService;
     
     @Autowired
     private UsuarioPaginationService paginationService;
 
+    @Autowired
+    private IUserService iUserService;
+
     @GetMapping("/findAll")
     public List<Usuario> findAll() {
-        return userService.findAll();
+        return userService.getAll();
     }
 
     @PostMapping("/save")
-    public Usuario save(@RequestBody UserRequestDto request) {
-        return userService.save(request);
-    }
-    
-    @GetMapping("/findPaginado")
-    public Page<UsuarioDto> findAll(Pageable pageable) {
-        return userService.findPaginado(pageable);
+    public ResponseEntity<?> save(@RequestBody UserRequestDto request) {
+        Usuario user = iUserService.saveUsuario(request);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+
     }
 
-    @PutMapping("update/{id}")
+    /*@PutMapping("update/{id}")
     public Usuario update(@PathVariable Long id, @RequestBody UserRequestDto entity) {
-        return userService.update(id, entity);
-    }
+
+
+    }*/
 
     @PostMapping("/pagination")
     public ResponseEntity<?> paginador(@RequestBody PaginationModel pagination ){
