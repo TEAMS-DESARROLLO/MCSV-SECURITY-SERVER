@@ -1,8 +1,11 @@
 package com.iat.security.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.iat.security.dto.UserRequestDto;
 import com.iat.security.model.Rol;
@@ -25,6 +28,10 @@ public class UserServiceImpl implements IUserService {
     private final IRolService rolService;
     private final IUsuarioRolService usuarioRolService;
 
+    @Autowired
+    @Lazy
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public UserDetailsService userDetailsService() {
         return new UserDetailsService() {
@@ -39,6 +46,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public Usuario saveUsuario(UserRequestDto request) {
+        request.setPassword(passwordEncoder.encode(request.getPassword()));
         Usuario user = userService.create(UtilMapper.convertUsuarioRequestDtoToUsuario(request));
         for (Long rolId : request.getRoles()) {
             Rol rol = rolService.entityById(rolId).orElseThrow(()-> new RuntimeException("Rol not found"));

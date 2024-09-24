@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class UserBusinessServiceImpl extends CRUDImpl<Usuario,Long> implements UserBusinessService {
     
-     private final IGenericRepository<Usuario,Long> repository;
+    private final IGenericRepository<Usuario,Long> repository;
 
     @Override
     protected IGenericRepository<Usuario, Long> getRepositorio() {

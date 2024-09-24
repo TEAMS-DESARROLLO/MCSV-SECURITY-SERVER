@@ -65,5 +65,5 @@ public class UsuarioController {
     public ResponseEntity<?> paginador(@RequestBody PaginationModel pagination ){
         Page<UsuarioDto> lst = paginationService.pagination(pagination);
         return new ResponseEntity<>(lst, HttpStatus.OK) ;
-    }  
+    } 
 }

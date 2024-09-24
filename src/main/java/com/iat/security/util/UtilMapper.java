@@ -23,7 +23,8 @@ public final class UtilMapper {
         return Usuario.builder()
                         .nombres(userRequestDto.getNombres())
                             .username(userRequestDto.getUsername())
-                                .build();
+                                .password(userRequestDto.getPassword())
+                                    .build();
     }
 
 
