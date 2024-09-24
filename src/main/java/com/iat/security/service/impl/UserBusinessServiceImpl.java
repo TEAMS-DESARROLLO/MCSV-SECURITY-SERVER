@@ -1,26 +1,16 @@
 package com.iat.security.service.impl;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-
-import com.iat.security.commons.Filter;
-import com.iat.security.commons.SortModel;
-import com.iat.security.dto.UserRequestDto;
-import com.iat.security.model.Rol;
 import com.iat.security.model.Usuario;
-import com.iat.security.model.UsuarioRol;
 import com.iat.security.repository.IGenericRepository;
 import com.iat.security.service.UserBusinessService;
 import lombok.RequiredArgsConstructor;
+
 @RequiredArgsConstructor
 @Service
 public class UserBusinessServiceImpl extends CRUDImpl<Usuario,Long> implements UserBusinessService {
     
      private final IGenericRepository<Usuario,Long> repository;
-     ;
 
     @Override
     protected IGenericRepository<Usuario, Long> getRepositorio() {

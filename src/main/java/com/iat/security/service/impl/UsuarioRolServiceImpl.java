@@ -14,8 +14,7 @@ public class UsuarioRolServiceImpl extends CRUDImpl<UsuarioRol,Long> implements 
 
     @Override
     protected IGenericRepository<UsuarioRol, Long> getRepositorio() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getRepositorio'");
+        return repository;
     }
 
 
