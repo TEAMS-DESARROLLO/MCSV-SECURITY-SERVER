@@ -22,7 +22,7 @@ public final class UtilMapper {
         if(userRequestDto==null) return null;
         
         return Usuario.builder()
-                        .nombres(userRequestDto.getNombres())
+                        .nombres(userRequestDto.getNames())
                             .username(userRequestDto.getUsername())
                                 .password(userRequestDto.getPassword())
                                     .build();

@@ -1,5 +1,7 @@
 package com.iat.security.service.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -50,9 +52,11 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional
     public Usuario saveUsuario(UserRequestDto request) {
+        /*if(iUsuarioRepository.findByUsernameIgnoreCase(request.getUsername().toLowerCase()).isPresent()){
+            throw new RuntimeException("El username ya existe");
+        }*/
 
-        try {
-            request.setPassword(passwordEncoder.encode(request.getPassword()));
+        request.setPassword(passwordEncoder.encode(request.getPassword()));
         Usuario user = userService.create(UtilMapper.convertUsuarioRequestDtoToUsuario(request));
         for (Long rolId : request.getRoles()) {
             Rol rol = rolService.entityById(rolId).orElseThrow(()-> new RuntimeException("Rol not found"));
@@ -62,12 +66,37 @@ public class UserServiceImpl implements IUserService {
             usuarioRolService.create(usuarioRol);
         }
         return user;
-        } catch (Exception e) {
-            // TODO: handle exception
-            System.out.println(e.getMessage());
-            return null;
+       
+    }
+
+
+    @Override
+    @Transactional
+    public Usuario updateUsuario(Long idUser,UserRequestDto request) {
+        Usuario user = userService.entityById(idUser).orElseThrow(() -> new RuntimeException("User not found"));
+        user.setNombres(request.getNames());
+        user.setUsername(request.getUsername());
+
+        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
+
+        userService.update(user, idUser);
         
+        List<UsuarioRol> usuarioRolesActuales = usuarioRolService.findByUsuarioId(idUser);
+
+        for (UsuarioRol usuarioRol : usuarioRolesActuales) {
+            usuarioRolService.delete(usuarioRol);
+        }
+
+        for (Long rolId : request.getRoles()) {
+            Rol rol = rolService.entityById(rolId).orElseThrow(()-> new RuntimeException("Rol not found"));
+            UsuarioRol usuarioRol = new UsuarioRol();
+            usuarioRol.setUsuario(user);
+            usuarioRol.setRol(rol);
+            usuarioRolService.create(usuarioRol);
+        }
+        return user;
     }
 
 }

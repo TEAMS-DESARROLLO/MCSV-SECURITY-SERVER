@@ -9,7 +9,6 @@ import com.iat.security.model.Usuario;
 
 
 public interface IUsuarioRepository extends JpaRepository<Usuario,Long> {
-
     Optional<Usuario>  findByUsername(String username);
-
+    Optional<Usuario>  findByUsernameIgnoreCase(String username);
 }
