@@ -10,7 +10,7 @@ import com.iat.security.commons.Filter;
 import com.iat.security.commons.IPaginationCommons;
 import com.iat.security.commons.PaginationModel;
 import com.iat.security.commons.SortModel;
-import com.iat.security.dto.UsuarioResponseDto;
+import com.iat.security.dto.UserResponseDto;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -18,12 +18,12 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class UsuarioPaginationService implements IPaginationCommons<UsuarioResponseDto>{
+public class UsuarioPaginationService implements IPaginationCommons<UserResponseDto>{
 
     private final  EntityManager entityManager;
 
     @Override
-    public Page<UsuarioResponseDto> pagination(PaginationModel pagination) {
+    public Page<UserResponseDto> pagination(PaginationModel pagination) {
         String sqlCount  = "SELECT count(a) " + getFrom().toString() + getFilters(pagination.getFilters()).toString();
         String sqlSelect = getSelect().toString() + getFrom().toString() +getFilters( pagination.getFilters()).toString() + getOrder(pagination.getSorts());
             
@@ -39,17 +39,17 @@ public class UsuarioPaginationService implements IPaginationCommons<UsuarioRespo
         querySelect.setMaxResults(pagination.getRowsPerPage());        
 
         @SuppressWarnings("unchecked")
-        List<UsuarioResponseDto> lista = querySelect.getResultList();
+        List<UserResponseDto> lista = querySelect.getResultList();
 
         PageRequest pageable = PageRequest.of(pagination.getPageNumber(), pagination.getRowsPerPage());
 
-        Page<UsuarioResponseDto> page = new PageImpl<UsuarioResponseDto>(lista, pageable, total);
+        Page<UserResponseDto> page = new PageImpl<UserResponseDto>(lista, pageable, total);
         return page;
     }
 
     @Override
     public StringBuilder getSelect() {
-        StringBuilder sql = new StringBuilder("SELECT new com.iat.security.dto.UsuarioDto(a.idUsuario,a.username,a.nombres) ");
+        StringBuilder sql = new StringBuilder("SELECT new com.iat.security.dto.UserResponseDto(a.idUsuario,a.username,a.nombres) ");
         return sql;
     }
 

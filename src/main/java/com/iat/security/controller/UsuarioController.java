@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.iat.security.commons.PaginationModel;
 import com.iat.security.dto.UserRequestDto;
-import com.iat.security.dto.UsuarioResponseDto;
+import com.iat.security.dto.UserResponseDto;
 import com.iat.security.model.Usuario;
 import com.iat.security.service.IUserService;
 import com.iat.security.service.UserBusinessService;
@@ -45,14 +45,14 @@ public class UsuarioController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<UsuarioResponseDto> save(@Valid @RequestBody UserRequestDto request) {
+    public ResponseEntity<UserResponseDto> save(@Valid @RequestBody UserRequestDto request) {
         try {
-            UsuarioResponseDto user = UtilMapper.convertUsuarioToUsuarioResponseDto(iUserService.saveUsuario(request));
-            return new ResponseEntity<UsuarioResponseDto>(user, HttpStatus.CREATED);
+            UserResponseDto user = UtilMapper.convertUsuarioToUserResponseDto(iUserService.saveUsuario(request));
+            return new ResponseEntity<UserResponseDto>(user, HttpStatus.CREATED);
         } catch (Exception e) {
             // Manejo de excepciones
             System.out.println(e.getMessage());
-            return new ResponseEntity<UsuarioResponseDto>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<UserResponseDto>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -64,7 +64,7 @@ public class UsuarioController {
 
     @PostMapping("/pagination")
     public ResponseEntity<?> paginador(@RequestBody PaginationModel pagination ){
-        Page<UsuarioResponseDto> lst = paginationService.pagination(pagination);
+        Page<UserResponseDto> lst = paginationService.pagination(pagination);
         return new ResponseEntity<>(lst, HttpStatus.OK) ;
     } 
 }

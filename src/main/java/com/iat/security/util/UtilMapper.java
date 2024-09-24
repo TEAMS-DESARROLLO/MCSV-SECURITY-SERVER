@@ -6,7 +6,7 @@ import  java.util.stream.Collectors;
 import com.iat.security.dto.RolRequestDto;
 import com.iat.security.dto.RolResponseDto;
 import com.iat.security.dto.UserRequestDto;
-import com.iat.security.dto.UsuarioResponseDto;
+import com.iat.security.dto.UserResponseDto;
 import com.iat.security.model.Rol;
 import com.iat.security.model.Usuario;
 
@@ -71,13 +71,13 @@ public final class UtilMapper {
     }
 
 
-    public static UsuarioResponseDto convertUsuarioToUsuarioResponseDto(Usuario user) {
+    public static UserResponseDto convertUsuarioToUserResponseDto(Usuario user) {
 
         if(user==null) return null;
 
-        return UsuarioResponseDto.builder()
-                            .idUsuario(user.getIdUsuario())
-                                .nombres(user.getNombres())
+        return UserResponseDto.builder()
+                            .idUser(user.getIdUsuario())
+                                .names(user.getNombres())
                                     .username(user.getUsername())
                                         .build();
     }

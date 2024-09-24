@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UsuarioResponseDto {
-    private Long idUsuario;
+public class UserResponseDto {
+    private Long idUser;
     private String username;
-    private String nombres;
+    private String names;
 }
