@@ -4,28 +4,24 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.iat.security.commons.PaginationModel;
 import com.iat.security.dto.UserRequestDto;
-import com.iat.security.dto.UsuarioDto;
-import com.iat.security.model.Rol;
+import com.iat.security.dto.UsuarioResponseDto;
 import com.iat.security.model.Usuario;
 import com.iat.security.service.IUserService;
 import com.iat.security.service.UserBusinessService;
 import com.iat.security.service.impl.UsuarioPaginationService;
 import com.iat.security.util.UtilMapper;
-
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+
 
 
 
@@ -49,10 +45,15 @@ public class UsuarioController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<?> save(@RequestBody UserRequestDto request) {
-        Usuario user = iUserService.saveUsuario(request);
-        return new ResponseEntity<>(user, HttpStatus.OK);
-
+    public ResponseEntity<UsuarioResponseDto> save(@Valid @RequestBody UserRequestDto request) {
+        try {
+            UsuarioResponseDto user = UtilMapper.convertUsuarioToUsuarioResponseDto(iUserService.saveUsuario(request));
+            return new ResponseEntity<UsuarioResponseDto>(user, HttpStatus.CREATED);
+        } catch (Exception e) {
+            // Manejo de excepciones
+            System.out.println(e.getMessage());
+            return new ResponseEntity<UsuarioResponseDto>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /*@PutMapping("update/{id}")
@@ -63,7 +64,7 @@ public class UsuarioController {
 
     @PostMapping("/pagination")
     public ResponseEntity<?> paginador(@RequestBody PaginationModel pagination ){
-        Page<UsuarioDto> lst = paginationService.pagination(pagination);
+        Page<UsuarioResponseDto> lst = paginationService.pagination(pagination);
         return new ResponseEntity<>(lst, HttpStatus.OK) ;
     } 
 }

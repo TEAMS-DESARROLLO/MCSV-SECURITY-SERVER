@@ -6,12 +6,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
 import com.iat.security.commons.Filter;
 import com.iat.security.commons.IPaginationCommons;
 import com.iat.security.commons.PaginationModel;
 import com.iat.security.commons.SortModel;
-import com.iat.security.dto.UsuarioDto;
+import com.iat.security.dto.UsuarioResponseDto;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -19,12 +18,12 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class UsuarioPaginationService implements IPaginationCommons<UsuarioDto>{
+public class UsuarioPaginationService implements IPaginationCommons<UsuarioResponseDto>{
 
     private final  EntityManager entityManager;
 
     @Override
-    public Page<UsuarioDto> pagination(PaginationModel pagination) {
+    public Page<UsuarioResponseDto> pagination(PaginationModel pagination) {
         String sqlCount  = "SELECT count(a) " + getFrom().toString() + getFilters(pagination.getFilters()).toString();
         String sqlSelect = getSelect().toString() + getFrom().toString() +getFilters( pagination.getFilters()).toString() + getOrder(pagination.getSorts());
             
@@ -40,11 +39,11 @@ public class UsuarioPaginationService implements IPaginationCommons<UsuarioDto>{
         querySelect.setMaxResults(pagination.getRowsPerPage());        
 
         @SuppressWarnings("unchecked")
-        List<UsuarioDto> lista = querySelect.getResultList();
+        List<UsuarioResponseDto> lista = querySelect.getResultList();
 
         PageRequest pageable = PageRequest.of(pagination.getPageNumber(), pagination.getRowsPerPage());
 
-        Page<UsuarioDto> page = new PageImpl<UsuarioDto>(lista, pageable, total);
+        Page<UsuarioResponseDto> page = new PageImpl<UsuarioResponseDto>(lista, pageable, total);
         return page;
     }
 
