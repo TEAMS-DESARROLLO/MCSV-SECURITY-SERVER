@@ -2,9 +2,10 @@ package com.iat.security.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,47 +14,59 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.iat.security.commons.PaginationModel;
 import com.iat.security.dto.RolRequestDto;
 import com.iat.security.dto.RolResponseDto;
+import com.iat.security.service.IRolPaginationService;
 import com.iat.security.service.IRolService;
 import com.iat.security.util.UtilMapper;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 
 
 @RestController
 @Slf4j
+@RequiredArgsConstructor
 @RequestMapping("/role")
 public class RolController {
-    @Autowired
-    private IRolService rolService;
+    
+    private final IRolService rolService;
+
+    private final IRolPaginationService rolPaginationService;
 
     @GetMapping("/findAll")
     public List<RolResponseDto> findAll() {
         return  UtilMapper.convertListRolToListRolResponseDto(rolService.getAll());
     }
 
-    @PostMapping("/save")
-    public RolResponseDto save(@RequestBody RolRequestDto rolRequestDto) {
-        return UtilMapper.convertRolToRolResponseDto(
-                    rolService.create(UtilMapper.convertRolRequestDtoToRol(rolRequestDto)));
+    @PostMapping("/create")
+    public ResponseEntity<RolResponseDto> save(@RequestBody RolRequestDto rolRequestDto) {
+     return new ResponseEntity<>(UtilMapper.convertRolToRolResponseDto(
+                     rolService.create(UtilMapper.convertRolRequestDtoToRol(rolRequestDto))), HttpStatus.CREATED);
     }
 
-    @GetMapping("/findPaginado")
-    public Page<RolResponseDto> findAll(Pageable pageable) {
-        return null;
-        //rolService.findPaginado(pageable);
+    @PostMapping("/pagination")
+    public ResponseEntity<?> paginador(@RequestBody PaginationModel pagination) {
+        Page<?> lst = rolPaginationService.pagination(pagination);
+        return new ResponseEntity<>(lst, HttpStatus.OK) ;
     }
 
-    @GetMapping("/findById/{id}")
-    public RolResponseDto findById(@PathVariable Long id) {
+    @GetMapping("/{id}")
+    public RolResponseDto findById(@PathVariable("id") Long id) {
         return rolService.entityById(id).map(UtilMapper::convertRolToRolResponseDto).orElse(null);
     }
 
-    @PutMapping("update/{id}")
-    public RolResponseDto putMethodName(@PathVariable Long id, @RequestBody RolRequestDto rolRequestDto) {
+    @PutMapping("/{id}")
+    public RolResponseDto update(@PathVariable("id") Long id, @RequestBody RolRequestDto rolRequestDto) {
         return UtilMapper.convertRolToRolResponseDto(
                     rolService.update(UtilMapper.convertRolRequestDtoToRol(rolRequestDto), id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<RolResponseDto> delete(@PathVariable("id") Long id) {
+        rolService.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

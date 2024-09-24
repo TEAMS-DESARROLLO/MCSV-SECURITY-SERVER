@@ -27,8 +27,8 @@ public class Rol {
     private Long id;
 
     @Column(name="rol_name",nullable = false,unique = true)
-    private String nombre;
+    private String name;
 
     @Column(name="rol_description",nullable = false)
-    private String descripcion;
+    private String description;
 }

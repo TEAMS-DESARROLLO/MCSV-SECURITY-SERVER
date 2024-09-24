@@ -36,9 +36,17 @@ public final class UtilMapper {
         
         if(rolRequestDto==null) return null;
         
-        return Rol.builder()
-                        .nombre(rolRequestDto.getNombre())
-                            .descripcion(rolRequestDto.getDescripcion())
+        if(rolRequestDto.getId() == 0){
+            return Rol.builder()
+                        .name(rolRequestDto.getName())
+                            .description(rolRequestDto.getDescription())
+                                .build();
+        }
+
+            return Rol.builder()
+                        .id(rolRequestDto.getId())
+                        .name(rolRequestDto.getName())
+                            .description(rolRequestDto.getDescription())
                                 .build();
     }
 
@@ -47,8 +55,9 @@ public final class UtilMapper {
         if(rol==null) return null;
         
         return RolRequestDto.builder()
-                                .nombre(rol.getNombre())
-                                    .descripcion(rol.getDescripcion())
+                                  .id(rol.getId())
+                                   .name(rol.getName())
+                                    .description(rol.getDescription())
                                         .build();
     }
 
@@ -57,17 +66,16 @@ public final class UtilMapper {
         if(rol==null) return null;
 
         return RolResponseDto.builder()
-                                .nombre(rol.getNombre())
-                                    .descripcion(rol.getDescripcion())
-                                        .build();
+                                .id(rol.getId())
+                                    .name(rol.getName())
+                                        .description(rol.getDescription())
+                                            .build();
     }
 
     public static List<RolResponseDto> convertListRolToListRolResponseDto(List<Rol> listaRols) {
 
         return listaRols.stream().map(rol -> convertRolToRolResponseDto(rol))
                             .collect(Collectors.toList());
-
-
     }
 
 
