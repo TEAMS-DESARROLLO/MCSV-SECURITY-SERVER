@@ -2,10 +2,11 @@ package com.iat.security.commons;
 
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 
 public interface IBaseInterfaceService<T,ID> {
-    //public Page<?> pagination(Integer pagenumber, Integer rows, List<SortModel> sortModel, Filter filter);
+    public Page<?> pagination(Integer pagenumber, Integer rows, List<SortModel> sortModel, Filter filter);
 
 	public T create(T entidad);
 

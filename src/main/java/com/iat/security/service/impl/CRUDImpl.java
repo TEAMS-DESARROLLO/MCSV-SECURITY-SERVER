@@ -3,7 +3,11 @@ package com.iat.security.service.impl;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+
+import com.iat.security.commons.Filter;
 import com.iat.security.commons.IBaseInterfaceService;
+import com.iat.security.commons.SortModel;
 import com.iat.security.exception.ModelNotFoundException;
 import com.iat.security.exception.RepositoryException;
 
@@ -76,6 +80,9 @@ public abstract class CRUDImpl<T,ID> implements IBaseInterfaceService<T,ID>  {
         return getRepositorio().save(entidad);
     }
 
-
+    @Override
+    public Page<?> pagination(Integer pagenumber, Integer rows, List<SortModel> sortModel, Filter filter) {
+        return null;
+    }
     
 }

@@ -12,5 +12,6 @@ public class ServiceException extends RuntimeException {
         this.code = code;
         this.httpStatus = httpStatus;
     }
+
     
 }
