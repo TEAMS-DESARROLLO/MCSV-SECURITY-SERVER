@@ -1,5 +1,6 @@
 package com.iat.security.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -14,6 +15,7 @@ import com.iat.security.commons.PaginationModel;
 import com.iat.security.commons.SortModel;
 import com.iat.security.dto.RolResponseDto;
 import com.iat.security.exception.ServiceException;
+import com.iat.security.util.DateUtil;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -32,26 +34,20 @@ public class IRolPaginationService implements IPaginationCommons<RolResponseDto>
 
 			String sqlCount = "SELECT count(r) " + getFrom().toString() + getFilters(pagination.getFilters()).toString();
 			String sqlSelect = getSelect().toString() + getFrom().toString() + getFilters(pagination.getFilters()).toString() + getOrder(pagination.getSorts());
-
+            
 			Query queryCount = entityManager.createQuery(sqlCount);
+            
 			Query querySelect = entityManager.createQuery(sqlSelect);
-
-			this.setParams(pagination.getFilters(), queryCount);
-			this.setParams(pagination.getFilters(), querySelect);
-
-			Long total = (long) queryCount.getSingleResult();
-
-			querySelect.setFirstResult((pagination.getPageNumber()) * pagination.getRowsPerPage());
-			querySelect.setMaxResults(pagination.getRowsPerPage());
-
-			@SuppressWarnings("unchecked")
+            this.setParams(pagination.getFilters(), queryCount);
+            this.setParams(pagination.getFilters(), querySelect);
+            Long total = (long) queryCount.getSingleResult();
+            querySelect.setFirstResult((pagination.getPageNumber()) * pagination.getRowsPerPage());
+            querySelect.setMaxResults(pagination.getRowsPerPage());
+            @SuppressWarnings("unchecked")
 			List<RolResponseDto> lista = querySelect.getResultList();
-
-			PageRequest pageable = PageRequest.of(pagination.getPageNumber(), pagination.getRowsPerPage());
-
-			Page<RolResponseDto> page = new PageImpl<RolResponseDto>(lista, pageable, total);
-
-			return page;
+            PageRequest pageable = PageRequest.of(pagination.getPageNumber(), pagination.getRowsPerPage());
+            Page<RolResponseDto> page = new PageImpl<RolResponseDto>(lista, pageable, total);
+            return page;
 		} catch (RuntimeException e) {
 			throw new ServiceException("error when generating the pagination " , e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -59,7 +55,7 @@ public class IRolPaginationService implements IPaginationCommons<RolResponseDto>
 
     @Override
     public StringBuilder getSelect() {
-        StringBuilder sql = new StringBuilder("SELECT new com.iat.security.dto.RolResponseDto(r.id,r.name,r.description) ");
+        StringBuilder sql = new StringBuilder("SELECT new com.iat.security.dto.RolResponseDto(r.id, r.name, r.description, r.createdAt AS createdAt, r.updatedAt AS updatedAt) ");
         return sql;
     }
 
@@ -83,6 +79,12 @@ public class IRolPaginationService implements IPaginationCommons<RolResponseDto>
             if(filtro.getField().equals("description")){
                 sql.append(" AND r.description LIKE :description ");
             }
+            if(filtro.getField().equals("createdAt")){
+            	sql.append(" AND DATE(r.createdAt) = :createdAt");
+            }
+            if(filtro.getField().equals("updatedAt")){
+            	sql.append(" AND DATE(r.updatedAt) = :updatedAt");
+            }
         }
         
         return sql;
@@ -100,6 +102,14 @@ public class IRolPaginationService implements IPaginationCommons<RolResponseDto>
             if(filtro.getField().equals("description")){
                 query.setParameter("description","%"+filtro.getValue()+"%");
             }
+            if(filtro.getField().equals("createdAt")){
+	           	LocalDate createdAt = DateUtil.convertStringToLocalDate(filtro.getValue().trim());
+	           	query.setParameter("createdAt", createdAt);
+	        }
+	        if(filtro.getField().equals("updatedAt")){
+	           	LocalDate updatedAt = DateUtil.convertStringToLocalDate(filtro.getValue().trim());
+	           	query.setParameter("updatedAt", updatedAt);
+	        }
         }
         return query;
     }
@@ -131,6 +141,18 @@ public class IRolPaginationService implements IPaginationCommons<RolResponseDto>
                     if(flagMore)
                         sql.append(", ");
                     sql.append( " description " + sort.getSort() );
+                    flagMore = true;
+                }
+                if(sort.getColName().equals("createdAt")){
+                    if(flagMore)
+                        sql.append(", ");
+                    sql.append( " createdAt " + sort.getSort() );
+                    flagMore = true;
+                }
+                if(sort.getColName().equals("updatedAt")){
+                    if(flagMore)
+                        sql.append(", ");
+                    sql.append( " updatedAt " + sort.getSort() );
                     flagMore = true;
                 }
            }

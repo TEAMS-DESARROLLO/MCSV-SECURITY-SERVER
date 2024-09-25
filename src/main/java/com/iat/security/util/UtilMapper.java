@@ -40,13 +40,17 @@ public final class UtilMapper {
             return Rol.builder()
                         .name(rolRequestDto.getName())
                             .description(rolRequestDto.getDescription())
-                                .build();
+                              .createdAt(rolRequestDto.getCreatedAt())
+                                .updatedAt(rolRequestDto.getUpdatedAt())
+                                 .build();
         }
 
             return Rol.builder()
                         .id(rolRequestDto.getId())
                         .name(rolRequestDto.getName())
                             .description(rolRequestDto.getDescription())
+                              .createdAt(rolRequestDto.getCreatedAt())
+                               .updatedAt(rolRequestDto.getUpdatedAt())
                                 .build();
     }
 
@@ -58,6 +62,8 @@ public final class UtilMapper {
                                   .id(rol.getId())
                                    .name(rol.getName())
                                     .description(rol.getDescription())
+                                      .createdAt(rol.getCreatedAt())
+                                       .updatedAt(rol.getUpdatedAt())
                                         .build();
     }
 
@@ -69,6 +75,8 @@ public final class UtilMapper {
                                 .id(rol.getId())
                                     .name(rol.getName())
                                         .description(rol.getDescription())
+                                          .createdAt(rol.getCreatedAt())
+                                           .updatedAt(rol.getUpdatedAt())
                                             .build();
     }
 

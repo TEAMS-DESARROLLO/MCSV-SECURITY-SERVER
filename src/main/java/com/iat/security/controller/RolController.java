@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.iat.security.commons.PaginationModel;
 import com.iat.security.dto.RolRequestDto;
 import com.iat.security.dto.RolResponseDto;
+import com.iat.security.exception.ModelNotFoundException;
 import com.iat.security.service.IRolPaginationService;
 import com.iat.security.service.IRolService;
 import com.iat.security.util.UtilMapper;
@@ -55,7 +56,7 @@ public class RolController {
 
     @GetMapping("/{id}")
     public RolResponseDto findById(@PathVariable("id") Long id) {
-        return rolService.entityById(id).map(UtilMapper::convertRolToRolResponseDto).orElse(null);
+        return rolService.entityById(id).map(UtilMapper::convertRolToRolResponseDto).orElseThrow(()->new ModelNotFoundException("ID NOT FOUND " + id)) ;
     }
 
     @PutMapping("/{id}")
