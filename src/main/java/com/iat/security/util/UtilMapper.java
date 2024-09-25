@@ -95,6 +95,7 @@ public final class UtilMapper {
                             .idUser(user.getIdUsuario())
                                 .names(user.getNombres())
                                     .username(user.getUsername())
-                                        .build();
+                                        .registrationStatus(user.getRegistrationStatus())
+                                            .build();
     }
 }

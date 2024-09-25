@@ -49,7 +49,7 @@ public class UsuarioPaginationService implements IPaginationCommons<UserResponse
 
     @Override
     public StringBuilder getSelect() {
-        StringBuilder sql = new StringBuilder("SELECT new com.iat.security.dto.UserResponseDto(a.idUsuario,a.username,a.nombres) ");
+        StringBuilder sql = new StringBuilder("SELECT new com.iat.security.dto.UserResponseDto(a.idUsuario,a.username,a.nombres,a.registrationStatus) ");
         return sql;
     }
 

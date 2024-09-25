@@ -13,4 +13,5 @@ public class UserResponseDto {
     private Long idUser;
     private String username;
     private String names;
+    private String registrationStatus;
 }

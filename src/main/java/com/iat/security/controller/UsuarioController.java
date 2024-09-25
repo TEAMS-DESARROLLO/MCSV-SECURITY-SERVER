@@ -47,7 +47,7 @@ public class UsuarioController {
         return userService.getAll();
     }
 
-    @PostMapping("/save")
+    @PostMapping("/create")
     public ResponseEntity<UserResponseDto> save(@Valid @RequestBody UserRequestDto request) {
         UserResponseDto user = UtilMapper.convertUsuarioToUserResponseDto(iUserService.saveUsuario(request));
         return new ResponseEntity<UserResponseDto>(user, HttpStatus.CREATED);
@@ -67,7 +67,7 @@ public class UsuarioController {
 
     @DeleteMapping("delete/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id){
-        userService.deleteById(id);
+        iUserService.deleteUsuario(id);
         return new ResponseEntity<>( HttpStatus.NO_CONTENT);
     }
 }

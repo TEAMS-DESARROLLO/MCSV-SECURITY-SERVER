@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.iat.security.constants.RegistrationStatus;
 import com.iat.security.service.Role;
 
 import jakarta.persistence.CascadeType;
@@ -56,6 +57,9 @@ public class Usuario implements UserDetails {
     @Column(name="updated_at" ,nullable = true)
     private LocalDateTime updatedAt;
 
+    @Column(name="registration_status ", nullable=false,length = 1)
+    private String registrationStatus;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
          //return List.of(new SimpleGrantedAuthority("ADMIN"));
@@ -80,6 +84,7 @@ public class Usuario implements UserDetails {
     }
     @PrePersist
     public void prePersisten(){
+        this.registrationStatus=RegistrationStatus.ACTIVE;
         this.createdAt=LocalDateTime.now();
     }
     @PreUpdate

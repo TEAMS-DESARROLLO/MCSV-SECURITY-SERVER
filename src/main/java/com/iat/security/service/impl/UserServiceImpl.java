@@ -101,4 +101,14 @@ public class UserServiceImpl implements IUserService {
         return user;
     }
 
+
+    @Override
+    public Usuario deleteUsuario(Long idUser) {
+        // TODO Auto-generated method stub
+        Usuario user = userService.entityById(idUser).orElseThrow(() -> new ModelNotFoundException("Usuario no encontrado"));
+        user.setRegistrationStatus("I");
+        userService.update(user, idUser);   
+        return user;
+    }
+
 }
