@@ -85,5 +85,11 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(err, HttpStatus.INTERNAL_SERVER_ERROR) ;
     }
 
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<CustomErrorResponse> handleConflictException(ConflictException ex, WebRequest request) {
+    CustomErrorResponse err = new CustomErrorResponse(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
+    return new ResponseEntity<>(err, HttpStatus.CONFLICT); // HTTP 409 Conflict
+    }
+
 
 }

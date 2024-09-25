@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.iat.security.dto.UserRequestDto;
+import com.iat.security.exception.ConflictException;
+import com.iat.security.exception.ModelNotFoundException;
 import com.iat.security.model.Rol;
 import com.iat.security.model.Usuario;
 import com.iat.security.model.UsuarioRol;
@@ -52,14 +54,14 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional
     public Usuario saveUsuario(UserRequestDto request) {
-        /*if(iUsuarioRepository.findByUsernameIgnoreCase(request.getUsername().toLowerCase()).isPresent()){
-            throw new RuntimeException("El username ya existe");
-        }*/
+        if(iUsuarioRepository.findByUsernameIgnoreCase(request.getUsername().toLowerCase()).isPresent()){
+            throw new ConflictException("El username ya existe");
+        }
 
         request.setPassword(passwordEncoder.encode(request.getPassword()));
         Usuario user = userService.create(UtilMapper.convertUsuarioRequestDtoToUsuario(request));
         for (Long rolId : request.getRoles()) {
-            Rol rol = rolService.entityById(rolId).orElseThrow(()-> new RuntimeException("Rol not found"));
+            Rol rol = rolService.entityById(rolId).orElseThrow(()-> new ModelNotFoundException("Rol no encontrado"));
             UsuarioRol usuarioRol = new UsuarioRol();
             usuarioRol.setUsuario(user);
             usuarioRol.setRol(rol);
@@ -73,7 +75,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional
     public Usuario updateUsuario(Long idUser,UserRequestDto request) {
-        Usuario user = userService.entityById(idUser).orElseThrow(() -> new RuntimeException("User not found"));
+        Usuario user = userService.entityById(idUser).orElseThrow(() -> new ModelNotFoundException("Usuario no encontrado"));
         user.setNombres(request.getNames());
         user.setUsername(request.getUsername());
 
@@ -90,7 +92,7 @@ public class UserServiceImpl implements IUserService {
         }
 
         for (Long rolId : request.getRoles()) {
-            Rol rol = rolService.entityById(rolId).orElseThrow(()-> new RuntimeException("Rol not found"));
+            Rol rol = rolService.entityById(rolId).orElseThrow(()-> new ModelNotFoundException("Rol no encontrado"));
             UsuarioRol usuarioRol = new UsuarioRol();
             usuarioRol.setUsuario(user);
             usuarioRol.setRol(rol);
