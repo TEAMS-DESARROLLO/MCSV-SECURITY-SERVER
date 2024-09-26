@@ -50,7 +50,6 @@ public class UserServiceImpl implements IUserService {
         };
     }
 
-
     @Override
     @Transactional
     public Usuario saveUsuario(UserRequestDto request) {
@@ -60,7 +59,7 @@ public class UserServiceImpl implements IUserService {
 
         request.setPassword(passwordEncoder.encode(request.getPassword()));
         Usuario user = userService.create(UtilMapper.convertUsuarioRequestDtoToUsuario(request));
-        for (Long rolId : request.getRoles()) {
+        for (Long rolId : request.getIdRol()) {
             Rol rol = rolService.entityById(rolId).orElseThrow(()-> new ModelNotFoundException("Rol no encontrado"));
             UsuarioRol usuarioRol = new UsuarioRol();
             usuarioRol.setUsuario(user);
@@ -70,7 +69,6 @@ public class UserServiceImpl implements IUserService {
         return user;
        
     }
-
 
     @Override
     @Transactional
@@ -91,7 +89,7 @@ public class UserServiceImpl implements IUserService {
             usuarioRolService.delete(usuarioRol);
         }
 
-        for (Long rolId : request.getRoles()) {
+        for (Long rolId : request.getIdRol()) {
             Rol rol = rolService.entityById(rolId).orElseThrow(()-> new ModelNotFoundException("Rol no encontrado"));
             UsuarioRol usuarioRol = new UsuarioRol();
             usuarioRol.setUsuario(user);
@@ -104,7 +102,6 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public Usuario deleteUsuario(Long idUser) {
-        // TODO Auto-generated method stub
         Usuario user = userService.entityById(idUser).orElseThrow(() -> new ModelNotFoundException("Usuario no encontrado"));
         user.setRegistrationStatus("I");
         userService.update(user, idUser);   
