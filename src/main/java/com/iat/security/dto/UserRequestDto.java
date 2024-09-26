@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class UserRequestDto {
     private String username;
     private String password;
-    private String names;
+    private String nombres;
+    private String registrationStatus;
     private List<Long>roles;
 }

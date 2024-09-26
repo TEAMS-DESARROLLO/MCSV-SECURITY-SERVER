@@ -60,6 +60,9 @@ public class Usuario implements UserDetails {
     @Column(name="registration_status ", nullable=false,length = 1)
     private String registrationStatus;
 
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<UsuarioRol> usuarioRoles;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
          //return List.of(new SimpleGrantedAuthority("ADMIN"));

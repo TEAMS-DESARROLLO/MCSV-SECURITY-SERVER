@@ -1,5 +1,7 @@
 package com.iat.security.dto;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,4 +16,5 @@ public class UserResponseDto {
     private String username;
     private String nombres;
     private String registrationStatus;
+    private List<Long> roles;
 }

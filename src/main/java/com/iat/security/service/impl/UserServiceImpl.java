@@ -1,5 +1,6 @@
 package com.iat.security.service.impl;
 
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
@@ -62,13 +63,19 @@ public class UserServiceImpl implements IUserService {
 
         request.setPassword(passwordEncoder.encode(request.getPassword()));
         Usuario user = userBusinessService.create(UtilMapper.convertUsuarioRequestDtoToUsuario(request));
+
+        List<UsuarioRol> usuarioRoles = new ArrayList<>();
+
         for (Long rolId : request.getRoles()) {
             Rol rol = rolService.entityById(rolId).orElseThrow(()-> new ModelNotFoundException("Rol no encontrado"));
             UsuarioRol usuarioRol = new UsuarioRol();
             usuarioRol.setUsuario(user);
             usuarioRol.setRol(rol);
             usuarioRolService.create(usuarioRol);
+
+            usuarioRoles.add(usuarioRol);
         }
+        user.setUsuarioRoles(usuarioRoles);
         return user;
        
     }
@@ -78,9 +85,9 @@ public class UserServiceImpl implements IUserService {
     @Transactional
     public Usuario updateUsuario(Long idUser,UserRequestDto request) {
         Usuario user = userBusinessService.entityById(idUser).orElseThrow(() -> new ModelNotFoundException("Usuario no encontrado"));
-        user.setNombres(request.getNames());
+        user.setNombres(request.getNombres());
         user.setUsername(request.getUsername());
-
+        user.setRegistrationStatus(request.getRegistrationStatus());
         
         /* byte[] decodeBytes = Base64.getDecoder().decode(user.getPassword());
         String userPasswordPlainText = new String(decodeBytes); */
@@ -95,6 +102,8 @@ public class UserServiceImpl implements IUserService {
         
         List<UsuarioRol> usuarioRolesActuales = usuarioRolService.findByUsuarioId(idUser);
 
+        List<UsuarioRol> usuarioRoles = new ArrayList<>();
+
         for (UsuarioRol usuarioRol : usuarioRolesActuales) {
             usuarioRolService.delete(usuarioRol);
         }
@@ -105,7 +114,11 @@ public class UserServiceImpl implements IUserService {
             usuarioRol.setUsuario(user);
             usuarioRol.setRol(rol);
             usuarioRolService.create(usuarioRol);
+
+            usuarioRoles.add(usuarioRol);
         }
+
+        user.setUsuarioRoles(usuarioRoles);
         return user;
     }
 

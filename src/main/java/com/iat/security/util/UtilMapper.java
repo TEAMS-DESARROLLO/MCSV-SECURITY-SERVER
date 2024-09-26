@@ -1,6 +1,8 @@
 package com.iat.security.util;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collector;
 import  java.util.stream.Collectors;
 
 import com.iat.security.dto.RolRequestDto;
@@ -22,7 +24,7 @@ public final class UtilMapper {
         if(userRequestDto==null) return null;
         
         return Usuario.builder()
-                        .nombres(userRequestDto.getNames())
+                        .nombres(userRequestDto.getNombres())
                             .username(userRequestDto.getUsername())
                                 .password(userRequestDto.getPassword())
                                     .build();
@@ -91,11 +93,22 @@ public final class UtilMapper {
 
         if(user==null) return null;
 
+        List<Long> roles = new ArrayList<>();
+        if( user.getUsuarioRoles() != null ){
+            roles = user.getUsuarioRoles().stream().map( r -> r.getRol().getId() )
+                .map( Long :: valueOf )
+                .toList();
+            /* roles = user.getUsuarioRoles().stream().map( r -> r.getRol().getId() )
+                .map( String :: valueOf )
+                .collect(Collectors.joining(",")); */
+        }
+
         return UserResponseDto.builder()
                             .idUsuario(user.getIdUsuario())
                                 .nombres(user.getNombres())
                                     .username(user.getUsername())
                                         .registrationStatus(user.getRegistrationStatus())
+                                            .roles(roles)
                                             .build();
     }
 }
