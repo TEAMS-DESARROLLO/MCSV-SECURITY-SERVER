@@ -2,6 +2,8 @@ package com.iat.security.model;
 
 import java.time.LocalDateTime;
 
+import com.iat.security.constants.RegistrationStatus;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -46,8 +48,12 @@ public class Rol {
     @Column(name="updated_at" ,nullable = true)
     private LocalDateTime updatedAt;
 
+    @Column(name="registration_status", nullable=false,length = 1)
+    private String registrationStatus;
+
     @PrePersist
     public void prePersisten(){
+        this.registrationStatus=RegistrationStatus.ACTIVE;
         this.createdAt=LocalDateTime.now();
     }
     @PreUpdate

@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserResponseDto {
-    private Long idUser;
+    private Long idUsuario;
     private String username;
-    private String names;
+    private String nombres;
     private String registrationStatus;
 }
