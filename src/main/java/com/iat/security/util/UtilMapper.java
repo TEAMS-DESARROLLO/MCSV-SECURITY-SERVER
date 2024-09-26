@@ -42,7 +42,7 @@ public final class UtilMapper {
                             .description(rolRequestDto.getDescription())
                               .createdAt(rolRequestDto.getCreatedAt())
                                 .updatedAt(rolRequestDto.getUpdatedAt())
-                                 .build();
+                                      .build();
         }
 
             return Rol.builder()
@@ -51,7 +51,8 @@ public final class UtilMapper {
                             .description(rolRequestDto.getDescription())
                               .createdAt(rolRequestDto.getCreatedAt())
                                .updatedAt(rolRequestDto.getUpdatedAt())
-                                .build();
+                                .registrationStatus(rolRequestDto.getRegistrationStatus())
+                                 .build();
     }
 
 	public static RolRequestDto convertRolToRolRequestDto(Rol rol) {
@@ -68,7 +69,7 @@ public final class UtilMapper {
     }
 
     public static RolResponseDto convertRolToRolResponseDto(Rol rol) {
-
+        System.out.println(">>>>>>>>" + rol);
         if(rol==null) return null;
 
         return RolResponseDto.builder()
@@ -77,7 +78,8 @@ public final class UtilMapper {
                                         .description(rol.getDescription())
                                           .createdAt(rol.getCreatedAt())
                                            .updatedAt(rol.getUpdatedAt())
-                                            .build();
+                                            .registrationStatus(rol.getRegistrationStatus())
+                                             .build();
     }
 
     public static List<RolResponseDto> convertListRolToListRolResponseDto(List<Rol> listaRols) {

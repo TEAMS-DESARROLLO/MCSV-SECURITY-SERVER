@@ -55,7 +55,7 @@ public class IRolPaginationService implements IPaginationCommons<RolResponseDto>
 
     @Override
     public StringBuilder getSelect() {
-        StringBuilder sql = new StringBuilder("SELECT new com.iat.security.dto.RolResponseDto(r.id, r.name, r.description, r.createdAt AS createdAt, r.updatedAt AS updatedAt) ");
+        StringBuilder sql = new StringBuilder("SELECT new com.iat.security.dto.RolResponseDto(r.id, r.name, r.description, r.createdAt AS createdAt, r.updatedAt AS updatedAt, r.registrationStatus as registrationStatus) ");
         return sql;
     }
 
@@ -85,6 +85,9 @@ public class IRolPaginationService implements IPaginationCommons<RolResponseDto>
             if(filtro.getField().equals("updatedAt")){
             	sql.append(" AND DATE(r.updatedAt) = :updatedAt");
             }
+            if(filtro.getField().equals("registrationStatus")){
+            	sql.append(" r.registrationStatus = :registrationStatus");
+            }
         }
         
         return sql;
@@ -110,6 +113,10 @@ public class IRolPaginationService implements IPaginationCommons<RolResponseDto>
 	           	LocalDate updatedAt = DateUtil.convertStringToLocalDate(filtro.getValue().trim());
 	           	query.setParameter("updatedAt", updatedAt);
 	        }
+            if(filtro.getField().equals("registrationStatus")){
+                LocalDate registrationStatus = DateUtil.convertStringToLocalDate(filtro.getValue().trim());
+                query.setParameter("registrationStatus", registrationStatus);
+         }
         }
         return query;
     }
@@ -137,7 +144,7 @@ public class IRolPaginationService implements IPaginationCommons<RolResponseDto>
                     flagMore = true;
                 }
 
-                if(sort.getColName().equals("descriptcion")){
+                if(sort.getColName().equals("description")){
                     if(flagMore)
                         sql.append(", ");
                     sql.append( " description " + sort.getSort() );
@@ -155,6 +162,13 @@ public class IRolPaginationService implements IPaginationCommons<RolResponseDto>
                     sql.append( " updatedAt " + sort.getSort() );
                     flagMore = true;
                 }
+                if(sort.getColName().equals("registrationStatus")){
+                    if(flagMore)
+                        sql.append(", ");
+                    sql.append( " registrationStatus " + sort.getSort() );
+                    flagMore = true;
+                }
+                
            }
         }
          return sql;

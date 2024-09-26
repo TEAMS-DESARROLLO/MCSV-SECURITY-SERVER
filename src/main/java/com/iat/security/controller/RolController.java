@@ -61,8 +61,10 @@ public class RolController {
 
     @PutMapping("/{id}")
     public RolResponseDto update(@PathVariable("id") Long id, @RequestBody RolRequestDto rolRequestDto) {
+    
         return UtilMapper.convertRolToRolResponseDto(
                     rolService.update(UtilMapper.convertRolRequestDtoToRol(rolRequestDto), id));
+        
     }
 
     @DeleteMapping("/{id}")
