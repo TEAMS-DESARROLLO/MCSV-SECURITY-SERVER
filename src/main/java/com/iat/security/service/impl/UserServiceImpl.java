@@ -75,7 +75,7 @@ public class UserServiceImpl implements IUserService {
     public Usuario updateUsuario(Long idUser,UserRequestDto request) {
         Usuario user = userService.entityById(idUser).orElseThrow(() -> new ModelNotFoundException("Usuario no encontrado"));
         user.setNombres(request.getNames());
-        user.setUsername(request.getUsername());
+        //user.setUsername(request.getUsername());
 
         if (request.getPassword() != null && !request.getPassword().isEmpty()) {
             user.setPassword(passwordEncoder.encode(request.getPassword()));

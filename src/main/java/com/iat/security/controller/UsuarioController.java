@@ -65,9 +65,9 @@ public class UsuarioController {
         return new ResponseEntity<>(lst, HttpStatus.OK) ;
     } 
 
-    @DeleteMapping("delete/{id}")
+    @PutMapping("delete/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id){
-        iUserService.deleteUsuario(id);
-        return new ResponseEntity<>( HttpStatus.NO_CONTENT);
+        UserResponseDto response = UtilMapper.convertUsuarioToUserResponseDto(iUserService.deleteUsuario(id));
+        return new ResponseEntity<UserResponseDto>( response,HttpStatus.OK);
     }
 }
