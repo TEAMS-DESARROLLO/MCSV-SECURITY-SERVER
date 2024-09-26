@@ -1,5 +1,6 @@
 package com.iat.security.service.impl;
 
+import java.util.Base64;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import com.iat.security.dto.UserRequestDto;
 import com.iat.security.exception.ConflictException;
 import com.iat.security.exception.ModelNotFoundException;
@@ -30,7 +32,7 @@ import lombok.RequiredArgsConstructor;
 public class UserServiceImpl implements IUserService {
 
     private final IUsuarioRepository iUsuarioRepository;
-    private final UserBusinessService userService;
+    private final UserBusinessService userBusinessService;
     private final IRolService rolService;
     private final IUsuarioRolService usuarioRolService;
 
@@ -59,7 +61,7 @@ public class UserServiceImpl implements IUserService {
         }
 
         request.setPassword(passwordEncoder.encode(request.getPassword()));
-        Usuario user = userService.create(UtilMapper.convertUsuarioRequestDtoToUsuario(request));
+        Usuario user = userBusinessService.create(UtilMapper.convertUsuarioRequestDtoToUsuario(request));
         for (Long rolId : request.getRoles()) {
             Rol rol = rolService.entityById(rolId).orElseThrow(()-> new ModelNotFoundException("Rol no encontrado"));
             UsuarioRol usuarioRol = new UsuarioRol();
@@ -75,15 +77,21 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional
     public Usuario updateUsuario(Long idUser,UserRequestDto request) {
-        Usuario user = userService.entityById(idUser).orElseThrow(() -> new ModelNotFoundException("Usuario no encontrado"));
+        Usuario user = userBusinessService.entityById(idUser).orElseThrow(() -> new ModelNotFoundException("Usuario no encontrado"));
         user.setNombres(request.getNames());
         user.setUsername(request.getUsername());
 
-        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+        
+        /* byte[] decodeBytes = Base64.getDecoder().decode(user.getPassword());
+        String userPasswordPlainText = new String(decodeBytes); */
+        /* boolean samePassword = passwordEncoder.matches(request.getPassword(),user.getPassword());
+        if(!samePassword){
             user.setPassword(passwordEncoder.encode(request.getPassword()));
-        }
-
-        userService.update(user, idUser);
+        } */
+        /* if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        } */
+        userBusinessService.update(user, idUser);
         
         List<UsuarioRol> usuarioRolesActuales = usuarioRolService.findByUsuarioId(idUser);
 
@@ -103,12 +111,11 @@ public class UserServiceImpl implements IUserService {
 
 
     @Override
-    public Usuario deleteUsuario(Long idUser) {
+    public void deleteUsuario(Long idUser) {
         // TODO Auto-generated method stub
-        Usuario user = userService.entityById(idUser).orElseThrow(() -> new ModelNotFoundException("Usuario no encontrado"));
+        Usuario user = userBusinessService.entityById(idUser).orElseThrow(() -> new ModelNotFoundException("Usuario no encontrado"));
         user.setRegistrationStatus("I");
-        userService.update(user, idUser);   
-        return user;
+        userBusinessService.update(user, idUser);
     }
 
 }
