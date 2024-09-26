@@ -61,8 +61,24 @@ public class UsuarioPaginationService implements IPaginationCommons<UserResponse
 
     @Override
     public StringBuilder getFilters(List<Filter> filters) {
-        // TODO Auto-generated method stub
-        StringBuilder sql = new StringBuilder("where 1=1 ");
+        StringBuilder sql = new StringBuilder(" where 1=1 ");
+
+        for(Filter filtro:filters){
+            if(filtro.getField().equals("idUsuario")){
+                sql.append(" AND a.idUsuario = :idUsuario");
+            }
+            if(filtro.getField().equals("username")){
+                sql.append(" AND UPPER(a.username) LIKE UPPER(:username)");
+            }
+            if(filtro.getField().equals("nombres")){
+                sql.append(" AND UPPER(a.nombres) LIKE UPPER(:nombres) ");
+            }
+            if(filtro.getField().equals("registrationStatus")){
+                sql.append(" AND UPPER(a.registrationStatus) LIKE UPPER(:registrationStatus) ");
+            }
+
+        }
+
         return sql;
     }
 
@@ -79,6 +95,9 @@ public class UsuarioPaginationService implements IPaginationCommons<UserResponse
             if(filtro.getField().equals("nombres")){
                 query.setParameter("nombres","%"+filtro.getValue()+"%");
             }
+            if(filtro.getField().equals("registrationStatus")){
+                query.setParameter("registrationStatus",filtro.getValue());
+            }
         }
         return query;
     }
@@ -87,7 +106,7 @@ public class UsuarioPaginationService implements IPaginationCommons<UserResponse
     public StringBuilder getOrder(List<SortModel> sorts) {
         boolean flagMore = false;
         StringBuilder sql = new StringBuilder("");
-        if(sorts.size() > 0){
+        if(!sorts.isEmpty()){
             sql.append(" ORDER BY ");
 
             for(SortModel sort:sorts){
@@ -98,7 +117,14 @@ public class UsuarioPaginationService implements IPaginationCommons<UserResponse
                     sql.append( " idUsuario " + sort.getSort() );
                     flagMore = true;
                 }
+                
+                if(sort.getColName().equals("username")){
+                    if(flagMore)
+                        sql.append(", ");
 
+                    sql.append( " username " + sort.getSort() );
+                    flagMore = true;
+                }
 
                 if(sort.getColName().equals("nombres")){
                     if(flagMore)
@@ -107,11 +133,12 @@ public class UsuarioPaginationService implements IPaginationCommons<UserResponse
                     sql.append( " nombres " + sort.getSort() );
                     flagMore = true;
                 }
-                if(sort.getColName().equals("username")){
+
+                if(sort.getColName().equals("registrationStatus")){
                     if(flagMore)
                         sql.append(", ");
 
-                    sql.append( " username " + sort.getSort() );
+                    sql.append( " registrationStatus " + sort.getSort() );
                     flagMore = true;
                 }
             }

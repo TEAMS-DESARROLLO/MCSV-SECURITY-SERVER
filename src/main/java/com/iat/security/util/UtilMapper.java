@@ -94,8 +94,8 @@ public final class UtilMapper {
         if(user==null) return null;
 
         return UserResponseDto.builder()
-                            .idUser(user.getIdUsuario())
-                                .names(user.getNombres())
+                            .idUsuario(user.getIdUsuario())
+                                .nombres(user.getNombres())
                                     .username(user.getUsername())
                                         .registrationStatus(user.getRegistrationStatus())
                                             .build();

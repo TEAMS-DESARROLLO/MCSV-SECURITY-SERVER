@@ -9,6 +9,6 @@ public interface IUserService{
     UserDetailsService userDetailsService() ;
     Usuario saveUsuario(UserRequestDto request);
     Usuario updateUsuario(Long idUser, UserRequestDto request);
-    Usuario deleteUsuario(Long idUser);
+    void deleteUsuario(Long idUser);
 
 }
