@@ -37,10 +37,12 @@ public class RolController {
 
     private final IRolPaginationService rolPaginationService;
 
+    
     @GetMapping("/findAll")
     public List<RolResponseDto> findAll() {
-        return  UtilMapper.convertListRolToListRolResponseDto(rolService.getAll());
+        return  UtilMapper.convertListRolToListRolResponseDto(rolService.getAll().stream().filter(data->data.getRegistrationStatus().equals("A")).toList());
     }
+
 
     @PostMapping("/create")
     public ResponseEntity<RolResponseDto> save(@RequestBody RolRequestDto rolRequestDto) {

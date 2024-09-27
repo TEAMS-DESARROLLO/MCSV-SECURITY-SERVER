@@ -21,7 +21,7 @@ import com.iat.security.repository.IUsuarioRepository;
 import com.iat.security.service.IRolService;
 import com.iat.security.service.IUserService;
 import com.iat.security.service.IUsuarioRolService;
-import com.iat.security.service.UserBusinessService;
+import com.iat.security.service.IUserBusinessService;
 import com.iat.security.util.UtilMapper;
 
 import jakarta.transaction.Transactional;
@@ -32,7 +32,7 @@ import lombok.RequiredArgsConstructor;
 public class UserServiceImpl implements IUserService {
 
     private final IUsuarioRepository iUsuarioRepository;
-    private final UserBusinessService userBusinessService;
+    private final IUserBusinessService userBusinessService;
     private final IRolService rolService;
     private final IUsuarioRolService usuarioRolService;
 
@@ -86,15 +86,6 @@ public class UserServiceImpl implements IUserService {
         user.setUsername(request.getUsername());
         user.setRegistrationStatus(request.getRegistrationStatus());
         
-        /* byte[] decodeBytes = Base64.getDecoder().decode(user.getPassword());
-        String userPasswordPlainText = new String(decodeBytes); */
-        /* boolean samePassword = passwordEncoder.matches(request.getPassword(),user.getPassword());
-        if(!samePassword){
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-        } */
-        /* if (request.getPassword() != null && !request.getPassword().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-        } */
         userBusinessService.update(user, idUser);
         
         List<UsuarioRol> usuarioRolesActuales = usuarioRolService.findByUsuarioId(idUser);
