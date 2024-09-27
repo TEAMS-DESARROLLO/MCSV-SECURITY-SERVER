@@ -1,11 +1,14 @@
 package com.iat.security.service.impl;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
 import com.iat.security.commons.Filter;
 import com.iat.security.commons.IPaginationCommons;
 import com.iat.security.commons.PaginationModel;
@@ -19,16 +22,18 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class UsuarioPaginationService implements IPaginationCommons<UserResponseDto>{
-
+    
     private final  EntityManager entityManager;
 
     @Override
     public Page<UserResponseDto> pagination(PaginationModel pagination) {
-        String sqlCount  = "SELECT count(a) " + getFrom().toString() + getFilters(pagination.getFilters()).toString();
-        String sqlSelect = getSelect().toString() + getFrom().toString() +getFilters( pagination.getFilters()).toString() + getOrder(pagination.getSorts());
-            
-        Query queryCount = entityManager. createQuery(sqlCount);
-        Query querySelect = entityManager.createQuery(sqlSelect);
+        String sqlCount  = "SELECT COUNT(DISTINCT a.id_usuario) " + getFrom().toString() + getFilters(pagination.getFilters()).toString();
+        String sqlSelect = getSelect()
+                            .append (getFrom() )
+                            .append( getFilters( pagination.getFilters()) )
+                            .append( getOrder(pagination.getSorts())).toString();
+        Query queryCount = entityManager. createNativeQuery(sqlCount);
+        Query querySelect = entityManager.createNativeQuery(sqlSelect);
 
         this.setParams(pagination.getFilters(), queryCount);
         this.setParams(pagination.getFilters(), querySelect);
@@ -39,7 +44,22 @@ public class UsuarioPaginationService implements IPaginationCommons<UserResponse
         querySelect.setMaxResults(pagination.getRowsPerPage());        
 
         @SuppressWarnings("unchecked")
-        List<UserResponseDto> lista = querySelect.getResultList();
+        List<Object[]> results = querySelect.getResultList();
+
+        List<UserResponseDto> lista = results.stream()
+            .map(result -> {
+                Long idUsuario = ((Number) result[0]).longValue();
+                String username = (String) result[1];
+                String nombres = (String) result[2];
+                String registrationStatus = (String) result[3];
+        
+                List<Long> roles = Arrays.stream(((String) result[4]).split(","))
+                    .map(Long::valueOf)
+                    .collect(Collectors.toList());
+
+                return new UserResponseDto(idUsuario, username, nombres, registrationStatus, roles);
+            })
+            .collect(Collectors.toList());
 
         PageRequest pageable = PageRequest.of(pagination.getPageNumber(), pagination.getRowsPerPage());
 
@@ -49,13 +69,13 @@ public class UsuarioPaginationService implements IPaginationCommons<UserResponse
 
     @Override
     public StringBuilder getSelect() {
-        StringBuilder sql = new StringBuilder("SELECT new com.iat.security.dto.UserResponseDto(a.idUsuario,a.username,a.nombres,a.registrationStatus) ");
+        StringBuilder sql = new StringBuilder(" SELECT a.id_usuario ,a.username,a.nombres,a.registration_status ,STRING_AGG( CAST(ur.id_rol AS VARCHAR) , ',' ORDER BY ur.id_rol) AS roles ");
         return sql;
     }
 
     @Override
     public StringBuilder getFrom() {
-        StringBuilder sql = new StringBuilder(" FROM Usuario a ");
+        StringBuilder sql = new StringBuilder(" FROM x_usuario a INNER JOIN x_usuario_rol ur ON a.id_usuario = ur.id_usuario ");
         return sql;
     }
 
@@ -65,7 +85,7 @@ public class UsuarioPaginationService implements IPaginationCommons<UserResponse
 
         for(Filter filtro:filters){
             if(filtro.getField().equals("idUsuario")){
-                sql.append(" AND a.idUsuario = :idUsuario");
+                sql.append(" AND a.id_usuario = :idUsuario");
             }
             if(filtro.getField().equals("username")){
                 sql.append(" AND UPPER(a.username) LIKE UPPER(:username)");
@@ -74,7 +94,7 @@ public class UsuarioPaginationService implements IPaginationCommons<UserResponse
                 sql.append(" AND UPPER(a.nombres) LIKE UPPER(:nombres) ");
             }
             if(filtro.getField().equals("registrationStatus")){
-                sql.append(" AND UPPER(a.registrationStatus) LIKE UPPER(:registrationStatus) ");
+                sql.append(" AND UPPER(a.registration_status) LIKE UPPER(:registrationStatus) ");
             }
 
         }
@@ -104,46 +124,13 @@ public class UsuarioPaginationService implements IPaginationCommons<UserResponse
 
     @Override
     public StringBuilder getOrder(List<SortModel> sorts) {
-        boolean flagMore = false;
         StringBuilder sql = new StringBuilder("");
-        if(!sorts.isEmpty()){
-            sql.append(" ORDER BY ");
-
-            for(SortModel sort:sorts){
-                if(sort.getColName().equals("idUsuario")){
-                    if(flagMore)
-                        sql.append(", ");
-
-                    sql.append( " idUsuario " + sort.getSort() );
-                    flagMore = true;
-                }
-                
-                if(sort.getColName().equals("username")){
-                    if(flagMore)
-                        sql.append(", ");
-
-                    sql.append( " username " + sort.getSort() );
-                    flagMore = true;
-                }
-
-                if(sort.getColName().equals("nombres")){
-                    if(flagMore)
-                        sql.append(", ");
-
-                    sql.append( " nombres " + sort.getSort() );
-                    flagMore = true;
-                }
-
-                if(sort.getColName().equals("registrationStatus")){
-                    if(flagMore)
-                        sql.append(", ");
-
-                    sql.append( " registrationStatus " + sort.getSort() );
-                    flagMore = true;
-                }
-            }
-        }
+        sql.append("""
+                 GROUP BY a.id_usuario , a.username , a.nombres , a.registration_status    
+                 ORDER BY a.id_usuario  asc 
+                """);
         return sql;
     }
+
 
 }
