@@ -1,5 +1,6 @@
 package com.iat.security.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -9,6 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.iat.security.constants.RegistrationStatus;
+import com.iat.security.enums.StatusUser;
 import com.iat.security.service.Role;
 
 import jakarta.persistence.CascadeType;
@@ -63,6 +65,19 @@ public class Usuario implements UserDetails {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UsuarioRol> usuarioRoles;
 
+    @Column(name="created_by" ,nullable = true)
+    private String createdBy;
+
+    @Column(name="modified_by" ,nullable = true)
+    private String modifiedBy;
+    
+    @Column(name="expiration_date" ,nullable = true)
+    private LocalDate expirationDate;
+
+    @Column(name="status_user" ,nullable = true)
+    private Integer statusUser;
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
          //return List.of(new SimpleGrantedAuthority("ADMIN"));
@@ -87,8 +102,10 @@ public class Usuario implements UserDetails {
     }
     @PrePersist
     public void prePersisten(){
+        this.statusUser = StatusUser.ACTIVE.getValue();
         this.registrationStatus=RegistrationStatus.ACTIVE;
-        this.createdAt=LocalDateTime.now();
+        this.createdAt=LocalDateTime.now();        
+        
     }
     @PreUpdate
     public void preModify(){

@@ -59,7 +59,7 @@ public class UsuarioController {
     
 
     @PostMapping("/create")
-    public ResponseEntity<UserResponseDto> save(@Valid @RequestBody UserRequestDto request) {
+    public ResponseEntity<UserResponseDto> save(@RequestBody @Valid  UserRequestDto request) {
         UserResponseDto user = UtilMapper.convertUsuarioToUserResponseDto(iUserService.saveUsuario(request));
         return new ResponseEntity<UserResponseDto>(user, HttpStatus.CREATED);
     }

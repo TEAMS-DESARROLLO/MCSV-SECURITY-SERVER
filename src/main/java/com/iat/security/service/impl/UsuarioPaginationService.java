@@ -1,6 +1,10 @@
 package com.iat.security.service.impl;
 
+
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,6 +18,7 @@ import com.iat.security.commons.IPaginationCommons;
 import com.iat.security.commons.PaginationModel;
 import com.iat.security.commons.SortModel;
 import com.iat.security.dto.UserResponseDto;
+import com.iat.security.util.DateUtil;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -52,12 +57,15 @@ public class UsuarioPaginationService implements IPaginationCommons<UserResponse
                 String username = (String) result[1];
                 String nombres = (String) result[2];
                 String registrationStatus = (String) result[3];
-        
-                List<Long> roles = Arrays.stream(((String) result[4]).split(","))
+                String expirationDate = result[4] != null ? (String) result[4] : null;
+                List<Long> roles = Arrays.stream(((String) result[5]).split(","))
                     .map(Long::valueOf)
                     .collect(Collectors.toList());
 
-                return new UserResponseDto(idUsuario, username, nombres, registrationStatus, roles);
+                LocalDate expirationLocalDate = expirationDate != null ? 
+                                                    DateUtil.convertStringToLocalDate(expirationDate) : null;
+
+                return new UserResponseDto(idUsuario, username, nombres, registrationStatus,expirationLocalDate , roles);
             })
             .collect(Collectors.toList());
 
@@ -69,7 +77,7 @@ public class UsuarioPaginationService implements IPaginationCommons<UserResponse
 
     @Override
     public StringBuilder getSelect() {
-        StringBuilder sql = new StringBuilder(" SELECT a.id_usuario ,a.username,a.nombres,a.registration_status ,STRING_AGG( CAST(ur.id_rol AS VARCHAR) , ',' ORDER BY ur.id_rol) AS roles ");
+        StringBuilder sql = new StringBuilder(" SELECT a.id_usuario ,a.username,a.nombres,a.registration_status, TO_CHAR(a.expiration_date, 'DD-MM-YYYY') AS expiration_date ,STRING_AGG( CAST(ur.id_rol AS VARCHAR) , ',' ORDER BY ur.id_rol) AS roles ");
         return sql;
     }
 
@@ -81,12 +89,9 @@ public class UsuarioPaginationService implements IPaginationCommons<UserResponse
 
     @Override
     public StringBuilder getFilters(List<Filter> filters) {
-        StringBuilder sql = new StringBuilder(" where 1=1 ");
+        StringBuilder sql = new StringBuilder(" where 1=1 and status_user = 1 ");
 
-        for(Filter filtro:filters){
-            if(filtro.getField().equals("idUsuario")){
-                sql.append(" AND a.id_usuario = :idUsuario");
-            }
+        for(Filter filtro:filters){            
             if(filtro.getField().equals("username")){
                 sql.append(" AND UPPER(a.username) LIKE UPPER(:username)");
             }
@@ -105,10 +110,7 @@ public class UsuarioPaginationService implements IPaginationCommons<UserResponse
     @Override
     public Query setParams(List<Filter> filters, Query query) {
 
-        for(Filter filtro:filters){
-            if(filtro.getField().equals("idUsuario")){
-                query.setParameter("idUsuario",filtro.getValue() );
-            }
+        for(Filter filtro:filters){            
             if(filtro.getField().equals("username")){
                 query.setParameter("username","%"+filtro.getValue()+"%");
             }

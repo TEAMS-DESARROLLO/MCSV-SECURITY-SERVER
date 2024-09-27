@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.iat.security.dto.UserRequestDto;
+import com.iat.security.enums.StatusUser;
 import com.iat.security.exception.ConflictException;
 import com.iat.security.exception.ModelNotFoundException;
 import com.iat.security.model.Rol;
@@ -59,7 +62,10 @@ public class UserServiceImpl implements IUserService {
             throw new ConflictException("El username ya existe");
         }
 
+        String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         request.setPassword(passwordEncoder.encode(request.getPassword()));
+        request.setCreatedBy(username);
+
         Usuario user = userBusinessService.create(UtilMapper.convertUsuarioRequestDtoToUsuario(request));
 
         List<UsuarioRol> usuarioRoles = new ArrayList<>();
@@ -86,6 +92,10 @@ public class UserServiceImpl implements IUserService {
         user.setUsername(request.getUsername());
         user.setRegistrationStatus(request.getRegistrationStatus());
         
+        String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        user.setModifiedBy(username);
+        user.setExpirationDate(request.getExpirationDate());
+
         userBusinessService.update(user, idUser);
         
         List<UsuarioRol> usuarioRolesActuales = usuarioRolService.findByUsuarioId(idUser);
@@ -114,7 +124,8 @@ public class UserServiceImpl implements IUserService {
     @Override
     public Usuario deleteUsuario(Long idUser) {
         Usuario user = userBusinessService.entityById(idUser).orElseThrow(() -> new ModelNotFoundException("Usuario no encontrado"));
-        user.setRegistrationStatus("I");
+        //user.setRegistrationStatus("I");
+        user.setStatusUser(StatusUser.INACTIVE.getValue());
         return userBusinessService.update(user, idUser);
     }
 

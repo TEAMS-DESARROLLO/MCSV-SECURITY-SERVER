@@ -27,6 +27,8 @@ public final class UtilMapper {
                         .nombres(userRequestDto.getNombres())
                             .username(userRequestDto.getUsername())
                                 .password(userRequestDto.getPassword())
+                                    .createdBy(userRequestDto.getCreatedBy())
+                                    .expirationDate(userRequestDto.getExpirationDate())
                                     .build();
     }
 
@@ -111,6 +113,7 @@ public final class UtilMapper {
                                     .username(user.getUsername())
                                         .registrationStatus(user.getRegistrationStatus())
                                             .roles(roles)
+                                            .expirationDate(user.getExpirationDate())
                                             .build();
     }
 }
