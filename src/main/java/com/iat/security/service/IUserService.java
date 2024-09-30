@@ -10,5 +10,6 @@ public interface IUserService{
     Usuario saveUsuario(UserRequestDto request);
     Usuario updateUsuario(Long idUser, UserRequestDto request);
     Usuario deleteUsuario(Long idUser);
+    Usuario findByUsernameIgnoreCase(String username);
 
 }

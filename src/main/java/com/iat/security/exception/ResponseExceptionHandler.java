@@ -91,5 +91,9 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
     return new ResponseEntity<>(err, HttpStatus.CONFLICT); // HTTP 409 Conflict
     }
 
-
+    @ExceptionHandler(AuthenticationFailedException.class)
+    public ResponseEntity<CustomErrorResponse> handleAuthenticationFailed(AuthenticationFailedException ex, WebRequest request) {
+    CustomErrorResponse err = new CustomErrorResponse(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
+    return new ResponseEntity<>(err, HttpStatus.UNAUTHORIZED); // HTTP 409 Conflict
+    }
 }

@@ -129,4 +129,9 @@ public class UserServiceImpl implements IUserService {
         return userBusinessService.update(user, idUser);
     }
 
+    @Override
+    public Usuario findByUsernameIgnoreCase(String username) {
+        return iUsuarioRepository.findByUsernameIgnoreCase(username).orElseThrow(() -> new ModelNotFoundException("Usuario no encontrado"));
+    }
+
 }
