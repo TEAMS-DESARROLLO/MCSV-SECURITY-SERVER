@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties;
+import org.springframework.security.core.Authentication;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -62,9 +62,9 @@ public class UserServiceImpl implements IUserService {
             throw new ConflictException("El username ya existe");
         }
 
-        String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         request.setPassword(passwordEncoder.encode(request.getPassword()));
-        request.setCreatedBy(username);
+        request.setCreatedBy(authentication.getName());
 
         Usuario user = userBusinessService.create(UtilMapper.convertUsuarioRequestDtoToUsuario(request));
 
@@ -92,8 +92,9 @@ public class UserServiceImpl implements IUserService {
         user.setUsername(request.getUsername());
         user.setRegistrationStatus(request.getRegistrationStatus());
         
-        String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        user.setModifiedBy(username);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        user.setModifiedBy(authentication.getName());
         user.setExpirationDate(request.getExpirationDate());
 
         userBusinessService.update(user, idUser);
