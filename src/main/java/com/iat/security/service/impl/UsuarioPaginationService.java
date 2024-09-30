@@ -2,9 +2,7 @@ package com.iat.security.service.impl;
 
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,15 +55,16 @@ public class UsuarioPaginationService implements IPaginationCommons<UserResponse
                 String username = (String) result[1];
                 String nombres = (String) result[2];
                 String registrationStatus = (String) result[3];
-                String expirationDate = result[4] != null ? (String) result[4] : null;
-                List<Long> roles = Arrays.stream(((String) result[5]).split(","))
+                Long statusUser = ((Number) result[4]).longValue();
+                String expirationDate = result[5] != null ? (String) result[5] : null;
+                List<Long> roles = Arrays.stream(((String) result[6]).split(","))
                     .map(Long::valueOf)
                     .collect(Collectors.toList());
 
                 LocalDate expirationLocalDate = expirationDate != null ? 
                                                     DateUtil.convertStringToLocalDate(expirationDate) : null;
 
-                return new UserResponseDto(idUsuario, username, nombres, registrationStatus,expirationLocalDate , roles);
+                return new UserResponseDto(idUsuario, username, nombres, registrationStatus,statusUser,expirationLocalDate , roles);
             })
             .collect(Collectors.toList());
 
@@ -77,7 +76,7 @@ public class UsuarioPaginationService implements IPaginationCommons<UserResponse
 
     @Override
     public StringBuilder getSelect() {
-        StringBuilder sql = new StringBuilder(" SELECT a.id_usuario ,a.username,a.nombres,a.registration_status, TO_CHAR(a.expiration_date, 'DD-MM-YYYY') AS expiration_date ,STRING_AGG( CAST(ur.id_rol AS VARCHAR) , ',' ORDER BY ur.id_rol) AS roles ");
+        StringBuilder sql = new StringBuilder(" SELECT a.id_usuario ,a.username,a.nombres,a.registration_status,a.status_user, TO_CHAR(a.expiration_date, 'DD-MM-YYYY') AS expiration_date ,STRING_AGG( CAST(ur.id_rol AS VARCHAR) , ',' ORDER BY ur.id_rol) AS roles ");
         return sql;
     }
 

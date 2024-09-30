@@ -19,6 +19,7 @@ public class UserResponseDto {
     private String username;
     private String nombres;
     private String registrationStatus;
+    private Long statusUser;
     @JsonFormat(pattern = "dd-MM-yyyy")
 	private LocalDate expirationDate;
     private List<Long> roles;

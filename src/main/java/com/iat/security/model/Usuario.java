@@ -65,18 +65,14 @@ public class Usuario implements UserDetails {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UsuarioRol> usuarioRoles;
 
-    @Column(name="created_by" ,nullable = true)
-    private String createdBy;
-
-    @Column(name="modified_by" ,nullable = true)
-    private String modifiedBy;
-    
     @Column(name="expiration_date" ,nullable = true)
     private LocalDate expirationDate;
 
     @Column(name="status_user" ,nullable = true)
     private Integer statusUser;
 
+    @Column(name="id_user" ,nullable = true)
+    private Long idUser;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

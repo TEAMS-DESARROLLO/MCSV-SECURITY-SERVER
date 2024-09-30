@@ -2,10 +2,9 @@ package com.iat.security.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collector;
-import  java.util.stream.Collectors;
+import java.util.stream.Collectors;
 
-import com.iat.security.dto.RolRequestDto;
+import  com.iat.security.dto.RolRequestDto;
 import com.iat.security.dto.RolResponseDto;
 import com.iat.security.dto.UserRequestDto;
 import com.iat.security.dto.UserResponseDto;
@@ -27,8 +26,9 @@ public final class UtilMapper {
                         .nombres(userRequestDto.getNombres())
                             .username(userRequestDto.getUsername())
                                 .password(userRequestDto.getPassword())
-                                    .createdBy(userRequestDto.getCreatedBy())
+                                    .idUser(userRequestDto.getIdUser())
                                     .expirationDate(userRequestDto.getExpirationDate())
+                                    .statusUser(userRequestDto.getStatusUser())
                                     .build();
     }
 

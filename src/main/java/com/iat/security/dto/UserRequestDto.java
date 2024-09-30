@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,10 +21,10 @@ public class UserRequestDto {
     private String nombres;
     private String registrationStatus;
     private List<Long>roles;
-    private String createdBy;
 
     @JsonFormat(pattern = "dd-MM-yyyy")
     @NotNull( message = "Debe ingresar la fecha de expiración en formato dd-MM-yyyy" )
 	private LocalDate expirationDate;
     private Integer statusUser;
+    private Long idUser;
 }

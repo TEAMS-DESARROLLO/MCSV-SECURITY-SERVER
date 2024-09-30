@@ -62,9 +62,16 @@ public class UserServiceImpl implements IUserService {
             throw new ConflictException("El username ya existe");
         }
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Long idUsuario = (Long) SecurityContextHolder.getContext().getAuthentication().getCredentials();
+        // Authentication authentication = SecurityContextHolder.getContext().getAuthentication();        
+        // Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
+        // Long idUsuario = 0L;
+        // if (credentials instanceof Long) {
+        //     idUsuario = (Long) credentials;
+        // } 
+
         request.setPassword(passwordEncoder.encode(request.getPassword()));
-        request.setCreatedBy(authentication.getName());
+        request.setIdUser(idUsuario);
 
         Usuario user = userBusinessService.create(UtilMapper.convertUsuarioRequestDtoToUsuario(request));
 
@@ -92,10 +99,11 @@ public class UserServiceImpl implements IUserService {
         user.setUsername(request.getUsername());
         user.setRegistrationStatus(request.getRegistrationStatus());
         
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Long idUsuario = (Long) SecurityContextHolder.getContext().getAuthentication().getCredentials();
 
-        user.setModifiedBy(authentication.getName());
+        user.setIdUser(idUsuario);
         user.setExpirationDate(request.getExpirationDate());
+        user.setStatusUser(request.getStatusUser());
 
         userBusinessService.update(user, idUser);
         
@@ -125,7 +133,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public Usuario deleteUsuario(Long idUser) {
         Usuario user = userBusinessService.entityById(idUser).orElseThrow(() -> new ModelNotFoundException("Usuario no encontrado"));
-        user.setStatusUser(StatusUser.INACTIVE.getValue());
+        user.setRegistrationStatus("I");
         return userBusinessService.update(user, idUser);
     }
 
