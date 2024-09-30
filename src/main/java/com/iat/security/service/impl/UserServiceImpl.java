@@ -124,7 +124,6 @@ public class UserServiceImpl implements IUserService {
     @Override
     public Usuario deleteUsuario(Long idUser) {
         Usuario user = userBusinessService.entityById(idUser).orElseThrow(() -> new ModelNotFoundException("Usuario no encontrado"));
-        //user.setRegistrationStatus("I");
         user.setStatusUser(StatusUser.INACTIVE.getValue());
         return userBusinessService.update(user, idUser);
     }
