@@ -1,16 +1,18 @@
 package com.iat.security.service.impl;
 
 
+import java.time.LocalDate;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import com.iat.security.dto.AuthResponseDto;
 import com.iat.security.dto.SignUpRequest;
 import com.iat.security.dto.SigninRequest;
+import com.iat.security.exception.AuthenticationFailedException;
 import com.iat.security.exception.BussinessRuleException;
 import com.iat.security.exception.ServiceException;
 import com.iat.security.jwt.JwtService;
@@ -63,7 +65,10 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         if(user == null){
             return AuthResponseDto.builder().msg("El usuario no existe").status(403l) .build();
         }
-
+        LocalDate today = LocalDate.now();
+        if (user.getExpirationDate() != null && today.isAfter(user.getExpirationDate())) {
+            throw new AuthenticationFailedException("La cuenta ha expirado.");
+        }
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
         String jwt = jwtService.generateToken(user);
