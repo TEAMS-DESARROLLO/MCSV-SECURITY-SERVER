@@ -102,9 +102,6 @@ public final class UtilMapper {
             roles = user.getUsuarioRoles().stream().map( r -> r.getRol().getId() )
                 .map( Long :: valueOf )
                 .toList();
-            /* roles = user.getUsuarioRoles().stream().map( r -> r.getRol().getId() )
-                .map( String :: valueOf )
-                .collect(Collectors.joining(",")); */
         }
 
         return UserResponseDto.builder()
@@ -114,6 +111,7 @@ public final class UtilMapper {
                                         .registrationStatus(user.getRegistrationStatus())
                                             .roles(roles)
                                             .expirationDate(user.getExpirationDate())
+                                            .statusUser(user.getStatusUser())
                                             .build();
     }
 }

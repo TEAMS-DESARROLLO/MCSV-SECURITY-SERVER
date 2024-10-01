@@ -1,11 +1,12 @@
 package com.iat.security.service.impl;
 
-
-import java.time.LocalDate;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.hibernate.service.spi.ServiceException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -16,7 +17,6 @@ import com.iat.security.commons.IPaginationCommons;
 import com.iat.security.commons.PaginationModel;
 import com.iat.security.commons.SortModel;
 import com.iat.security.dto.UserResponseDto;
-import com.iat.security.util.DateUtil;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -29,86 +29,78 @@ public class UsuarioPaginationService implements IPaginationCommons<UserResponse
     private final  EntityManager entityManager;
 
     @Override
-    public Page<UserResponseDto> pagination(PaginationModel pagination) {
-        String sqlCount  = "SELECT COUNT(DISTINCT a.id_usuario) " + getFrom().toString() + getFilters(pagination.getFilters()).toString();
-        String sqlSelect = getSelect()
-                            .append (getFrom() )
-                            .append( getFilters( pagination.getFilters()) )
-                            .append( getOrder(pagination.getSorts())).toString();
-        Query queryCount = entityManager. createNativeQuery(sqlCount);
-        Query querySelect = entityManager.createNativeQuery(sqlSelect);
+	public Page<UserResponseDto> pagination(PaginationModel pagination) {
+		try {
 
-        this.setParams(pagination.getFilters(), queryCount);
-        this.setParams(pagination.getFilters(), querySelect);
+			String sqlSelect = getSelect().toString() + getFrom().toString() + getFilters(pagination.getFilters()).toString() + getOrder(pagination.getSorts());
 
-        Long total = (long) queryCount.getSingleResult();
+			Query querySelect = entityManager.createQuery(sqlSelect);
 
-        querySelect.setFirstResult((pagination.getPageNumber()) * pagination.getRowsPerPage());
-        querySelect.setMaxResults(pagination.getRowsPerPage());        
+			this.setParams(pagination.getFilters(), querySelect);
 
-        @SuppressWarnings("unchecked")
-        List<Object[]> results = querySelect.getResultList();
+			querySelect.setFirstResult((pagination.getPageNumber()) * pagination.getRowsPerPage());
+			querySelect.setMaxResults(pagination.getRowsPerPage());
 
-        List<UserResponseDto> lista = results.stream()
-            .map(result -> {
-                Long idUsuario = ((Number) result[0]).longValue();
-                String username = (String) result[1];
-                String nombres = (String) result[2];
-                String registrationStatus = (String) result[3];
-                Long statusUser = ((Number) result[4]).longValue();
-                String expirationDate = result[5] != null ? (String) result[5] : null;
-                List<Long> roles = Arrays.stream(((String) result[6]).split(","))
-                    .map(Long::valueOf)
-                    .collect(Collectors.toList());
+			@SuppressWarnings("unchecked")
+			List<UserResponseDto> lista = querySelect.getResultList();            
+            List<UserResponseDto> usuarios = lista.stream()
+                                                        .collect(Collectors.groupingBy(UserResponseDto::getIdUsuario))
+                                                        .values().stream()
+                                                        .map(grupo -> {
+                                                            if (grupo.isEmpty()) {
+                                                                return null;
+                                                            }
+                                                            UserResponseDto primerUsuario = grupo.get(0);                                                            
+                                                            Set<Long> roles = grupo.stream()
+                                                                .map(UserResponseDto::getIdRol)
+                                                                .filter(Objects::nonNull)
+                                                                .collect(Collectors.toSet());
+                                                            
+                                                            primerUsuario.setRoles(new ArrayList<>(roles));
+                                                            return primerUsuario;
+                                                        })
+                                                        .filter(Objects::nonNull)
+                                                        .collect(Collectors.toList());
 
-                LocalDate expirationLocalDate = expirationDate != null ? 
-                                                    DateUtil.convertStringToLocalDate(expirationDate) : null;
+            Long total =  Long.valueOf(usuarios.size());
+			PageRequest pageable = PageRequest.of(pagination.getPageNumber(), pagination.getRowsPerPage());
 
-                return new UserResponseDto(idUsuario, username, nombres, registrationStatus,statusUser,expirationLocalDate , roles);
-            })
-            .collect(Collectors.toList());
-
-        PageRequest pageable = PageRequest.of(pagination.getPageNumber(), pagination.getRowsPerPage());
-
-        Page<UserResponseDto> page = new PageImpl<UserResponseDto>(lista, pageable, total);
-        return page;
-    }
+			return new PageImpl<>(usuarios,pageable, total);
+		} catch (RuntimeException e) {
+			throw new ServiceException("error when generating the pagination " + e.getMessage(), e );
+		}
+	}
 
     @Override
-    public StringBuilder getSelect() {
-        StringBuilder sql = new StringBuilder(" SELECT a.id_usuario ,a.username,a.nombres,a.registration_status,a.status_user, TO_CHAR(a.expiration_date, 'DD-MM-YYYY') AS expiration_date ,STRING_AGG( CAST(ur.id_rol AS VARCHAR) , ',' ORDER BY ur.id_rol) AS roles ");
-        return sql;
-    }
+	public StringBuilder getSelect() {
+		return new StringBuilder("SELECT new com.iat.security.dto.UserResponseDto(xu.idUsuario,xu.username,xu.nombres,xu.registrationStatus,xu.statusUser,xu.expirationDate,xur.rol.id ) ");
+	}
 
-    @Override
-    public StringBuilder getFrom() {
-        StringBuilder sql = new StringBuilder(" FROM x_usuario a INNER JOIN x_usuario_rol ur ON a.id_usuario = ur.id_usuario ");
-        return sql;
-    }
+	@Override
+	public StringBuilder getFrom() {
+		return new StringBuilder(" FROM UsuarioRol xur  ")
+                         .append(" INNER JOIN Usuario xu ON xur.usuario.idUsuario = xu.idUsuario ")
+                         .append(" INNER JOIN Rol r ON xur.rol.id = r.id  ");
+	}
 
-    @Override
-    public StringBuilder getFilters(List<Filter> filters) {
-        StringBuilder sql = new StringBuilder(" where 1=1 and status_user = 1 ");
+	@Override
+	public StringBuilder getFilters(List<Filter> filters) {
+		 StringBuilder sql = new StringBuilder("where 1=1 AND xu.registrationStatus  = 'A' ");
 
-        for(Filter filtro:filters){            
+         for(Filter filtro:filters){            
             if(filtro.getField().equals("username")){
-                sql.append(" AND UPPER(a.username) LIKE UPPER(:username)");
+                sql.append(" AND UPPER(xu.username) LIKE UPPER(:username)");
             }
             if(filtro.getField().equals("nombres")){
-                sql.append(" AND UPPER(a.nombres) LIKE UPPER(:nombres) ");
-            }
-            if(filtro.getField().equals("registrationStatus")){
-                sql.append(" AND UPPER(a.registration_status) LIKE UPPER(:registrationStatus) ");
+                sql.append(" AND UPPER(xu.nombres) LIKE UPPER(:nombres) ");
             }
 
         }
-
         return sql;
-    }
+	}
 
-    @Override
-    public Query setParams(List<Filter> filters, Query query) {
-
+	@Override
+	public Query setParams(List<Filter> filters, Query query) {
         for(Filter filtro:filters){            
             if(filtro.getField().equals("username")){
                 query.setParameter("username","%"+filtro.getValue()+"%");
@@ -116,22 +108,18 @@ public class UsuarioPaginationService implements IPaginationCommons<UserResponse
             if(filtro.getField().equals("nombres")){
                 query.setParameter("nombres","%"+filtro.getValue()+"%");
             }
-            if(filtro.getField().equals("registrationStatus")){
-                query.setParameter("registrationStatus",filtro.getValue());
-            }
         }
         return query;
-    }
+	}
 
-    @Override
-    public StringBuilder getOrder(List<SortModel> sorts) {
+	@Override
+	public StringBuilder getOrder(List<SortModel> sorts) {
         StringBuilder sql = new StringBuilder("");
         sql.append("""
-                 GROUP BY a.id_usuario , a.username , a.nombres , a.registration_status    
-                 ORDER BY a.id_usuario  asc 
+                 GROUP BY xu.idUsuario , xu.username , xur.rol.id
+                 ORDER BY xu.idUsuario  asc 
                 """);
         return sql;
-    }
-
+	}
 
 }
