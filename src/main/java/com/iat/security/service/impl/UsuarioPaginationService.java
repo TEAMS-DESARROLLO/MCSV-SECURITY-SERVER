@@ -51,20 +51,20 @@ public class UsuarioPaginationService implements IPaginationCommons<UserResponse
 
         List<UserResponseDto> lista = results.stream()
             .map(result -> {
-                Long idUsuario = ((Number) result[0]).longValue();
-                String username = (String) result[1];
-                String nombres = (String) result[2];
-                String registrationStatus = (String) result[3];
-                Long statusUser = ((Number) result[4]).longValue();
-                String expirationDate = result[5] != null ? (String) result[5] : null;
-                List<Long> roles = Arrays.stream(((String) result[6]).split(","))
-                    .map(Long::valueOf)
-                    .collect(Collectors.toList());
+            Long idUsuario = ((Number) result[0]).longValue();
+            String username = (String) result[1];
+            String nombres = (String) result[2];
+            String registrationStatus = (String) result[3];
+            Long statusUser = ((Number) result[4]).longValue();
+            String expirationDate = (String) result[5];
+            List<Long> roles = Arrays.stream(((String) result[6]).split(","))
+                .map(Long::valueOf)
+                .collect(Collectors.toList());
 
-                LocalDate expirationLocalDate = expirationDate != null ? 
-                                                    DateUtil.convertStringToLocalDate(expirationDate) : null;
+            LocalDate expirationLocalDate = expirationDate != null ? 
+                                DateUtil.convertStringToLocalDate(expirationDate) : null;
 
-                return new UserResponseDto(idUsuario, username, nombres, registrationStatus,statusUser,expirationLocalDate , roles);
+            return new UserResponseDto(idUsuario, username, nombres, registrationStatus, statusUser, expirationLocalDate, roles);
             })
             .collect(Collectors.toList());
 
