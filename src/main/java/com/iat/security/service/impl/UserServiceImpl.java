@@ -62,7 +62,7 @@ public class UserServiceImpl implements IUserService {
             throw new ConflictException("El username ya existe");
         }
 
-        Long idUsuario = (Long) SecurityContextHolder.getContext().getAuthentication().getCredentials();
+        //Long idUsuario = (Long) SecurityContextHolder.getContext().getAuthentication().getCredentials();
         // Authentication authentication = SecurityContextHolder.getContext().getAuthentication();        
         // Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
         // Long idUsuario = 0L;
@@ -71,7 +71,7 @@ public class UserServiceImpl implements IUserService {
         // } 
 
         request.setPassword(passwordEncoder.encode(request.getPassword()));
-        request.setIdUser(idUsuario);
+        request.setIdUser(1L);//FIXME obtener idUser del contexto de seguridad
 
         Usuario user = userBusinessService.create(UtilMapper.convertUsuarioRequestDtoToUsuario(request));
 
@@ -99,9 +99,9 @@ public class UserServiceImpl implements IUserService {
         user.setUsername(request.getUsername());
         user.setRegistrationStatus(request.getRegistrationStatus());
         
-        Long idUsuario = (Long) SecurityContextHolder.getContext().getAuthentication().getCredentials();
+        //Long idUsuario = (Long) SecurityContextHolder.getContext().getAuthentication().getCredentials();
 
-        user.setIdUser(idUsuario);
+        user.setIdUser(1L);//FIXME obtener idUser del contexto de seguridad
         user.setExpirationDate(request.getExpirationDate());
         user.setStatusUser(request.getStatusUser());
 

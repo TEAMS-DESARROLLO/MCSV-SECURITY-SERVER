@@ -13,21 +13,19 @@ import com.iat.security.constants.RegistrationStatus;
 import com.iat.security.enums.StatusUser;
 import com.iat.security.service.Role;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -62,7 +60,7 @@ public class Usuario implements UserDetails {
     @Column(name="registration_status ", nullable=false,length = 1)
     private String registrationStatus;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Transient
     private List<UsuarioRol> usuarioRoles;
 
     @Column(name="expiration_date" ,nullable = true)
