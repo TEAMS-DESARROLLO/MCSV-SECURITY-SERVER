@@ -109,9 +109,9 @@ public final class UtilMapper {
                                 .nombres(user.getNombres())
                                     .username(user.getUsername())
                                         .registrationStatus(user.getRegistrationStatus())
-                                            .roles(roles)
                                             .expirationDate(user.getExpirationDate())
                                             .statusUser(user.getStatusUser())
+                                            .roles(roles)
                                             .build();
     }
 }

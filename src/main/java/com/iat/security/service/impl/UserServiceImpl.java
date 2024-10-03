@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,17 +12,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.iat.security.dto.UserRequestDto;
-import com.iat.security.enums.StatusUser;
+import com.iat.security.dto.UserResponseDto;
+import com.iat.security.dto.UserRolDto;
 import com.iat.security.exception.ConflictException;
 import com.iat.security.exception.ModelNotFoundException;
+import com.iat.security.mapper.IUserCustomMapper;
 import com.iat.security.model.Rol;
 import com.iat.security.model.Usuario;
 import com.iat.security.model.UsuarioRol;
 import com.iat.security.repository.IUsuarioRepository;
 import com.iat.security.service.IRolService;
+import com.iat.security.service.IUserBusinessService;
 import com.iat.security.service.IUserService;
 import com.iat.security.service.IUsuarioRolService;
-import com.iat.security.service.IUserBusinessService;
 import com.iat.security.util.UtilMapper;
 
 import jakarta.transaction.Transactional;
@@ -38,6 +38,7 @@ public class UserServiceImpl implements IUserService {
     private final IUserBusinessService userBusinessService;
     private final IRolService rolService;
     private final IUsuarioRolService usuarioRolService;
+    private final IUserCustomMapper userCustomMapper;
 
     @Autowired
     @Lazy
@@ -140,6 +141,21 @@ public class UserServiceImpl implements IUserService {
     @Override
     public Usuario findByUsernameIgnoreCase(String username) {
         return iUsuarioRepository.findByUsernameIgnoreCase(username).orElseThrow(() -> new ModelNotFoundException("Usuario no encontrado"));
+    }
+
+    @Override
+    public UserResponseDto findById(Long idUser) {
+        List<UserRolDto> userRolesDTO =  iUsuarioRepository.findUserRolByUserId(idUser);
+        if( userRolesDTO == null ){
+            throw new ModelNotFoundException("There are not roles related to user id : "+idUser);
+        }
+        
+        UserResponseDto userResponseDto = null;
+        if( !userRolesDTO.isEmpty() ){
+            userResponseDto = userCustomMapper.toUserResponseDto(userRolesDTO);
+        }
+        
+        return userResponseDto;
     }
 
 }
