@@ -112,10 +112,32 @@ public class UsuarioPaginationService implements IPaginationCommons<UserListResp
                     flagMore = true;
                 }
 
+                if(sort.getColName().equals("nombres")){
+                    if(flagMore)
+                        sql.append(", ");
+
+                    sql.append( " nombres " + sort.getSort() );
+                    flagMore = true;
+                }
+
                 if(sort.getColName().equals("username")){
                     if(flagMore)
                         sql.append(", ");
                     sql.append( " username " + sort.getSort() );
+                    flagMore = true;
+                }
+
+                if(sort.getColName().equals("expirationDate")){
+                    if(flagMore)
+                        sql.append(", ");
+                    sql.append( " expirationDate " + sort.getSort() );
+                    flagMore = true;
+                }
+                
+                if(sort.getColName().equals("registrationStatus")){
+                    if(flagMore)
+                        sql.append(", ");
+                    sql.append( " registrationStatus " + sort.getSort() );
                     flagMore = true;
                 }
            }
