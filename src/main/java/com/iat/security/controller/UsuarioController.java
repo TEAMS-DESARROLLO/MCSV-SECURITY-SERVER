@@ -74,4 +74,10 @@ public class UsuarioController {
         UserResponseDto response = UtilMapper.convertUsuarioToUserResponseDto(iUserService.deleteUsuario(id));
         return new ResponseEntity<>( response,HttpStatus.OK);
     }
+
+    @PutMapping("/update/status-user/{id}")
+    public ResponseEntity<UserResponseDto> updateStatusUser(@PathVariable Long id, @RequestBody UserRequestDto entity) {
+        UserResponseDto user = UtilMapper.convertUsuarioToUserResponseDto(iUserService.updateStatusUser(id,entity));
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
 }

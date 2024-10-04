@@ -116,9 +116,6 @@ public class UserServiceImpl implements IUserService {
             usuarioRolService.delete(usuarioRol);
         }
 
-        if( request.getRoles() == null || request.getRoles().isEmpty()) 
-            return  user;
-
         for (Long rolId : request.getRoles()) {
             Rol rol = rolService.entityById(rolId).orElseThrow(()-> new ModelNotFoundException("Rol no encontrado"));
             UsuarioRol usuarioRol = new UsuarioRol();
@@ -159,6 +156,14 @@ public class UserServiceImpl implements IUserService {
         }
         
         return userResponseDto;
+    }
+
+    @Override
+    public Usuario updateStatusUser(Long idUser, UserRequestDto request) {
+        Usuario user = userBusinessService.entityById(idUser).orElseThrow(() -> new ModelNotFoundException("Usuario no encontrado"));    
+        user.setStatusUser(request.getStatusUser());
+        userBusinessService.update(user, idUser);
+        return user;
     }
 
 }
