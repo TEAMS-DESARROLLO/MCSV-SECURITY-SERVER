@@ -116,6 +116,9 @@ public class UserServiceImpl implements IUserService {
             usuarioRolService.delete(usuarioRol);
         }
 
+        if( request.getRoles() == null || request.getRoles().isEmpty()) 
+            return  user;
+
         for (Long rolId : request.getRoles()) {
             Rol rol = rolService.entityById(rolId).orElseThrow(()-> new ModelNotFoundException("Rol no encontrado"));
             UsuarioRol usuarioRol = new UsuarioRol();
