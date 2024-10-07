@@ -16,9 +16,9 @@ import com.iat.security.commons.PaginationModel;
 import com.iat.security.dto.UserListResponseDto;
 import com.iat.security.dto.UserRequestDto;
 import com.iat.security.dto.UserResponseDto;
+import com.iat.security.mapper.UserMapper;
 import com.iat.security.service.IUserService;
 import com.iat.security.service.impl.UsuarioPaginationService;
-import com.iat.security.util.UtilMapper;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/user")
 @Slf4j
 public class UsuarioController {
-
-    /* @Autowired
-    private IUserBusinessService userService; */
     
     @Autowired
     private UsuarioPaginationService paginationService;
@@ -37,29 +34,22 @@ public class UsuarioController {
     @Autowired
     private IUserService iUserService;
 
-   /*  @GetMapping("/findAll")
-    public List<Usuario> findAll() {
-        return userService.getAll();
-    } */
-
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDto> findById(@PathVariable("id") Long id) {
-        UserResponseDto userResponseDto = this.iUserService.findById(id);        
+        UserResponseDto userResponseDto = UserMapper.fromEntity(this.iUserService.findById(id));
         return new ResponseEntity<>(userResponseDto, HttpStatus.OK);
     }
     
 
     @PostMapping("/create")
     public ResponseEntity<UserResponseDto> save(@RequestBody @Valid  UserRequestDto request) {
-        //Long idUsuario = (Long) SecurityContextHolder.getContext().getAuthentication().getCredentials();
-        //request.setIdUser(idUsuario);
-        UserResponseDto user = UtilMapper.convertUsuarioToUserResponseDto(iUserService.saveUsuario(request));        
+        UserResponseDto user = UserMapper.fromEntity(iUserService.saveUsuario(request));
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<UserResponseDto> update(@PathVariable Long id, @RequestBody UserRequestDto entity) {
-        UserResponseDto user = UtilMapper.convertUsuarioToUserResponseDto(iUserService.updateUsuario(id,entity));
+        UserResponseDto user = UserMapper.fromEntity(iUserService.updateUsuario(id,entity));
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
@@ -69,15 +59,9 @@ public class UsuarioController {
         return new ResponseEntity<>(lst, HttpStatus.OK) ;
     } 
 
-    @PutMapping("/delete/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") Long id){
-        UserResponseDto response = UtilMapper.convertUsuarioToUserResponseDto(iUserService.deleteUsuario(id));
-        return new ResponseEntity<>( response,HttpStatus.OK);
-    }
-
     @PutMapping("/update/status-user/{id}")
     public ResponseEntity<UserResponseDto> updateStatusUser(@PathVariable Long id, @RequestBody UserRequestDto entity) {
-        UserResponseDto user = UtilMapper.convertUsuarioToUserResponseDto(iUserService.updateStatusUser(id,entity));
+        UserResponseDto user = UserMapper.fromEntity(iUserService.updateStatusUser(id,entity));
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 }
