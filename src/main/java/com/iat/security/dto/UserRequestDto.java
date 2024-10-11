@@ -27,4 +27,7 @@ public class UserRequestDto {
 	private LocalDate expirationDate;
     private Integer statusUser;
     private Long idUser;
+
+    private String file;
+    private String filename;
 }

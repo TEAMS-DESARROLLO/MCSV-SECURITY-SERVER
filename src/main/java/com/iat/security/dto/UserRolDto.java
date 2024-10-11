@@ -20,6 +20,8 @@ public class UserRolDto {
 	private LocalDate expirationDate;
     private Long idRol;
     private String rolName;
+    private String file;
+    private String filename;
     
 
 }

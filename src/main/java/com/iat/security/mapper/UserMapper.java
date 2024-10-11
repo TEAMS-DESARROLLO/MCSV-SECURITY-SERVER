@@ -24,6 +24,8 @@ public class UserMapper {
                         .expirationDate(userRequestDto.getExpirationDate())
                         .statusUser(userRequestDto.getStatusUser())
                         .idUser(userRequestDto.getIdUser())
+                        .file(userRequestDto.getFile())
+                        .filename(userRequestDto.getFilename())
                         .build();
     }
 
@@ -45,6 +47,8 @@ public class UserMapper {
                             .expirationDate(user.getExpirationDate())
                             .statusUser(user.getStatusUser())
                             .roles(roles)
+                            .file(user.getFile())
+                            .filename(user.getFilename())
                             .build();
     }
 
@@ -55,6 +59,8 @@ public class UserMapper {
         user.setIdUser(request.getIdUser());
         user.setExpirationDate(request.getExpirationDate());
         user.setStatusUser(request.getStatusUser());
+        user.setFile(request.getFile());
+        user.setFilename(request.getFilename());
     }
 
     public static Usuario fromRolesDtoToUser(List<UserRolDto> userRolesDto) {
@@ -74,6 +80,8 @@ public class UserMapper {
                             .boxed() 
                             .collect(Collectors.toSet());
         usuario.setRoles(roles);
+        usuario.setFile(userRolBase.getFile());
+        usuario.setFilename(userRolBase.getFilename());
         return usuario;
     }
 

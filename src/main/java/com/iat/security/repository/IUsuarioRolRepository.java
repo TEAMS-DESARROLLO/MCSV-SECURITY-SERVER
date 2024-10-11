@@ -9,7 +9,7 @@ import com.iat.security.model.UsuarioRol;
 public interface IUsuarioRolRepository  extends IGenericRepository<UsuarioRol,Long> {
 
     @Query("""
-        SELECT new com.iat.security.dto.UserRolDto (u.idUsuario,u.username,u.nombres,u.registrationStatus,u.statusUser,u.expirationDate,r.id,r.name ) 
+        SELECT new com.iat.security.dto.UserRolDto (u.idUsuario,u.username,u.nombres,u.registrationStatus,u.statusUser,u.expirationDate,r.id,r.name,u.file,u.filename ) 
         FROM Usuario u
         INNER JOIN UsuarioRol ur ON u.idUsuario = ur.usuario.idUsuario
         INNER JOIN Rol r ON ur.rol.id = r.id

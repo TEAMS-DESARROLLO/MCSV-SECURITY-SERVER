@@ -78,8 +78,7 @@ public class UsuarioPaginationService implements IPaginationCommons<UserListResp
             if(filtro.getField().equals("nombres")){
                 sql.append(" AND UPPER(u.nombres) LIKE UPPER(:nombres) ");
             }
-
-        }
+        }   
         return sql;
 	}
 

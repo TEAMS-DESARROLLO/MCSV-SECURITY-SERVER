@@ -46,6 +46,8 @@ public class Usuario implements UserDetails {
     private String username;
     private String password;
     private String nombres;
+    private String file;
+    private String filename;
 
     @Enumerated(EnumType.STRING) 
     Role role;
