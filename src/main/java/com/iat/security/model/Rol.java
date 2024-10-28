@@ -2,7 +2,7 @@ package com.iat.security.model;
 
 import java.time.LocalDateTime;
 
-import com.iat.security.constants.RegistrationStatus;
+import com.iat.security.enums.RegistrationStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -53,7 +53,7 @@ public class Rol {
 
     @PrePersist
     public void prePersisten(){
-        this.registrationStatus=RegistrationStatus.ACTIVE;
+        this.registrationStatus=RegistrationStatus.ACTIVE.getValue();
         this.createdAt=LocalDateTime.now();
     }
     @PreUpdate
