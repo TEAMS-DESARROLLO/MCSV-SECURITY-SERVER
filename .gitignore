@@ -5,7 +5,6 @@ target/
 !**/src/test/**/target/
 
 
-runjar.bat
 
 ### STS ###
 .apt_generated

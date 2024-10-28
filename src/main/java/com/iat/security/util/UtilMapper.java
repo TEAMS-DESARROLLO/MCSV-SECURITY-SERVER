@@ -98,11 +98,11 @@ public final class UtilMapper {
         if(user==null) return null;
 
         List<Long> roles = new ArrayList<>();
-        if( user.getUsuarioRoles() != null ){
-            roles = user.getUsuarioRoles().stream().map( r -> r.getRol().getId() )
-                .map( Long :: valueOf )
-                .toList();
-        }
+        // if( user.getUsuarioRoles() != null ){
+        //     roles = user.getUsuarioRoles().stream().map( r -> r.getRol().getId() )
+        //         .map( Long :: valueOf )
+        //         .toList();
+        // }
 
         return UserResponseDto.builder()
                             .idUsuario(user.getIdUsuario())

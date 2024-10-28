@@ -1,12 +1,11 @@
 package com.iat.security.service.impl;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,18 +13,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.iat.security.dto.UserRequestDto;
-import com.iat.security.enums.StatusUser;
+import com.iat.security.dto.UserRolDto;
 import com.iat.security.exception.ConflictException;
 import com.iat.security.exception.ModelNotFoundException;
+import com.iat.security.mapper.UserMapper;
 import com.iat.security.model.Rol;
 import com.iat.security.model.Usuario;
 import com.iat.security.model.UsuarioRol;
 import com.iat.security.repository.IUsuarioRepository;
+import com.iat.security.repository.IUsuarioRolRepository;
 import com.iat.security.service.IRolService;
+import com.iat.security.service.IUserBusinessService;
 import com.iat.security.service.IUserService;
 import com.iat.security.service.IUsuarioRolService;
-import com.iat.security.service.IUserBusinessService;
-import com.iat.security.util.UtilMapper;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +35,7 @@ import lombok.RequiredArgsConstructor;
 public class UserServiceImpl implements IUserService {
 
     private final IUsuarioRepository iUsuarioRepository;
+    private final IUsuarioRolRepository usuarioRolRepository;
     private final IUserBusinessService userBusinessService;
     private final IRolService rolService;
     private final IUsuarioRolService usuarioRolService;
@@ -62,20 +63,13 @@ public class UserServiceImpl implements IUserService {
             throw new ConflictException("El username ya existe");
         }
 
-        //Long idUsuario = (Long) SecurityContextHolder.getContext().getAuthentication().getCredentials();
-        // Authentication authentication = SecurityContextHolder.getContext().getAuthentication();        
-        // Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
-        // Long idUsuario = 0L;
-        // if (credentials instanceof Long) {
-        //     idUsuario = (Long) credentials;
-        // } 
-
         request.setPassword(passwordEncoder.encode(request.getPassword()));
         request.setIdUser(1L);//FIXME obtener idUser del contexto de seguridad
 
-        Usuario user = userBusinessService.create(UtilMapper.convertUsuarioRequestDtoToUsuario(request));
+        Usuario user = userBusinessService.create(UserMapper.fromDto(request));
 
-        List<UsuarioRol> usuarioRoles = new ArrayList<>();
+
+        Set<Long> usuarioRolesActualizados = new HashSet<>();
 
         for (Long rolId : request.getRoles()) {
             Rol rol = rolService.entityById(rolId).orElseThrow(()-> new ModelNotFoundException("Rol no encontrado"));
@@ -84,9 +78,9 @@ public class UserServiceImpl implements IUserService {
             usuarioRol.setRol(rol);
             usuarioRolService.create(usuarioRol);
 
-            usuarioRoles.add(usuarioRol);
+            usuarioRolesActualizados.add(usuarioRol.getId());
         }
-        user.setUsuarioRoles(usuarioRoles);
+        user.setRoles(usuarioRolesActualizados);
         return user;
        
     }
@@ -95,21 +89,14 @@ public class UserServiceImpl implements IUserService {
     @Transactional
     public Usuario updateUsuario(Long idUser,UserRequestDto request) {
         Usuario user = userBusinessService.entityById(idUser).orElseThrow(() -> new ModelNotFoundException("Usuario no encontrado"));
-        user.setNombres(request.getNombres());
-        user.setUsername(request.getUsername());
-        user.setRegistrationStatus(request.getRegistrationStatus());
-        
-        //Long idUsuario = (Long) SecurityContextHolder.getContext().getAuthentication().getCredentials();
-
-        user.setIdUser(1L);//FIXME obtener idUser del contexto de seguridad
-        user.setExpirationDate(request.getExpirationDate());
-        user.setStatusUser(request.getStatusUser());
+        user.setIdUser(1L);//FIXME obtener idUser del contexto de seguridad        
+        UserMapper.updateEntityfromDto(user,request);
 
         userBusinessService.update(user, idUser);
         
         List<UsuarioRol> usuarioRolesActuales = usuarioRolService.findByUsuarioId(idUser);
 
-        List<UsuarioRol> usuarioRoles = new ArrayList<>();
+        Set<Long> usuarioRolesActualizados = new HashSet<>();
 
         for (UsuarioRol usuarioRol : usuarioRolesActuales) {
             usuarioRolService.delete(usuarioRol);
@@ -122,24 +109,39 @@ public class UserServiceImpl implements IUserService {
             usuarioRol.setRol(rol);
             usuarioRolService.create(usuarioRol);
 
-            usuarioRoles.add(usuarioRol);
+            usuarioRolesActualizados.add(usuarioRol.getId());
         }
 
-        user.setUsuarioRoles(usuarioRoles);
+        user.setRoles(usuarioRolesActualizados);
         return user;
-    }
-
-
-    @Override
-    public Usuario deleteUsuario(Long idUser) {
-        Usuario user = userBusinessService.entityById(idUser).orElseThrow(() -> new ModelNotFoundException("Usuario no encontrado"));
-        user.setRegistrationStatus("I");
-        return userBusinessService.update(user, idUser);
     }
 
     @Override
     public Usuario findByUsernameIgnoreCase(String username) {
         return iUsuarioRepository.findByUsernameIgnoreCase(username).orElseThrow(() -> new ModelNotFoundException("Usuario no encontrado"));
+    }
+
+    @Override
+    public Usuario findById(Long idUser) {
+        List<UserRolDto> userRolesDTO =  usuarioRolRepository.findUserRolByUserId(idUser);
+        if( userRolesDTO == null ){
+            throw new ModelNotFoundException("No hay roles relacionado al usuario id : "+idUser);
+        }
+        
+        Usuario usuario = null;
+        if( !userRolesDTO.isEmpty() ){
+            usuario = UserMapper.fromRolesDtoToUser(userRolesDTO);
+        }
+        
+        return usuario;
+    }
+
+    @Override
+    public Usuario updateStatusUser(Long idUser, UserRequestDto request) {
+        Usuario user = userBusinessService.entityById(idUser).orElseThrow(() -> new ModelNotFoundException("Usuario no encontrado"));    
+        user.setStatusUser(request.getStatusUser());
+        userBusinessService.update(user, idUser);
+        return user;
     }
 
 }

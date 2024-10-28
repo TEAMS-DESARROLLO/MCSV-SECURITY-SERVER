@@ -4,12 +4,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.iat.security.constants.RegistrationStatus;
+import com.iat.security.enums.RegistrationStatus;
 import com.iat.security.enums.StatusUser;
 import com.iat.security.service.Role;
 
@@ -45,6 +46,8 @@ public class Usuario implements UserDetails {
     private String username;
     private String password;
     private String nombres;
+    private String file;
+    private String filename;
 
     @Enumerated(EnumType.STRING) 
     Role role;
@@ -61,7 +64,7 @@ public class Usuario implements UserDetails {
     private String registrationStatus;
 
     @Transient
-    private List<UsuarioRol> usuarioRoles;
+    private Set<Long> roles;
 
     @Column(name="expiration_date" ,nullable = true)
     private LocalDate expirationDate;
@@ -72,9 +75,10 @@ public class Usuario implements UserDetails {
     @Column(name="id_user" ,nullable = true)
     private Long idUser;
 
+    
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-         //return List.of(new SimpleGrantedAuthority("ADMIN"));
          return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
@@ -97,7 +101,7 @@ public class Usuario implements UserDetails {
     @PrePersist
     public void prePersisten(){
         this.statusUser = StatusUser.ACTIVE.getValue();
-        this.registrationStatus=RegistrationStatus.ACTIVE;
+        this.registrationStatus=RegistrationStatus.ACTIVE.getValue();
         this.createdAt=LocalDateTime.now();        
         
     }

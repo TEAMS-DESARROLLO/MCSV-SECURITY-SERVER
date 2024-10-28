@@ -9,7 +9,7 @@ public interface IUserService{
     UserDetailsService userDetailsService() ;
     Usuario saveUsuario(UserRequestDto request);
     Usuario updateUsuario(Long idUser, UserRequestDto request);
-    Usuario deleteUsuario(Long idUser);
     Usuario findByUsernameIgnoreCase(String username);
-
+    Usuario findById(Long idUser);
+    Usuario updateStatusUser(Long idUser, UserRequestDto request);
 }

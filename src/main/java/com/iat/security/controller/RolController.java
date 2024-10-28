@@ -17,10 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.iat.security.commons.PaginationModel;
 import com.iat.security.dto.RolRequestDto;
 import com.iat.security.dto.RolResponseDto;
+import com.iat.security.enums.RegistrationStatus;
 import com.iat.security.exception.ModelNotFoundException;
+import com.iat.security.mapper.RolMapper;
 import com.iat.security.service.IRolPaginationService;
 import com.iat.security.service.IRolService;
-import com.iat.security.util.UtilMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,14 +41,13 @@ public class RolController {
     
     @GetMapping("/findAll")
     public List<RolResponseDto> findAll() {
-        return  UtilMapper.convertListRolToListRolResponseDto(rolService.getAll().stream().filter(data->data.getRegistrationStatus().equals("A")).toList());
+        return  RolMapper.fromEntities(rolService.getAll().stream().filter(data->data.getRegistrationStatus().equals(RegistrationStatus.ACTIVE.getValue())).toList());
     }
 
 
     @PostMapping("/create")
     public ResponseEntity<RolResponseDto> save(@RequestBody RolRequestDto rolRequestDto) {
-     return new ResponseEntity<>(UtilMapper.convertRolToRolResponseDto(
-                     rolService.create(UtilMapper.convertRolRequestDtoToRol(rolRequestDto))), HttpStatus.CREATED);
+     return new ResponseEntity<>(RolMapper.fromEntity(rolService.create(RolMapper.fromDto(rolRequestDto))), HttpStatus.CREATED);
     }
 
     @PostMapping("/pagination")
@@ -58,14 +58,13 @@ public class RolController {
 
     @GetMapping("/{id}")
     public RolResponseDto findById(@PathVariable("id") Long id) {
-        return rolService.entityById(id).map(UtilMapper::convertRolToRolResponseDto).orElseThrow(()->new ModelNotFoundException("ID NOT FOUND " + id)) ;
+        return rolService.entityById(id).map(RolMapper::fromEntity).orElseThrow(()->new ModelNotFoundException("Id no encontrado " + id)) ;
     }
 
     @PutMapping("/{id}")
     public RolResponseDto update(@PathVariable("id") Long id, @RequestBody RolRequestDto rolRequestDto) {
     
-        return UtilMapper.convertRolToRolResponseDto(
-                    rolService.update(UtilMapper.convertRolRequestDtoToRol(rolRequestDto), id));
+        return RolMapper.fromEntity(rolService.update(RolMapper.fromDto(rolRequestDto), id));
         
     }
 
