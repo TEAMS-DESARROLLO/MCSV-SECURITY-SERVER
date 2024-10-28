@@ -1,0 +1,13 @@
+server:
+    port: 9001
+
+spring:
+    application:
+        name: mcsv-auth-server
+    config:
+        import: ${CONFIG_SERVER} 
+
+    cloud:
+        config:
+            #nombre base que se busca en el git o repositorio
+            name: config-server           
