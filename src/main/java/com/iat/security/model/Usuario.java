@@ -49,8 +49,8 @@ public class Usuario implements UserDetails {
     private String file;
     private String filename;
 
-    @Enumerated(EnumType.STRING) 
-    Role role;
+    // @Enumerated(EnumType.STRING) 
+    // Role role;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name="created_at",nullable = false)
@@ -63,8 +63,8 @@ public class Usuario implements UserDetails {
     @Column(name="registration_status ", nullable=false,length = 1)
     private String registrationStatus;
 
-    @Transient
-    private Set<Long> roles;
+    
+    //private Set<Long> roles;
 
     @Column(name="expiration_date" ,nullable = true)
     private LocalDate expirationDate;
@@ -77,10 +77,10 @@ public class Usuario implements UserDetails {
 
     
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-         return List.of(new SimpleGrantedAuthority(role.name()));
-    }
+    // @Override
+    // public Collection<? extends GrantedAuthority> getAuthorities() {
+    //      return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    // }
 
     @Override
     public boolean isAccountNonExpired() {
@@ -108,6 +108,10 @@ public class Usuario implements UserDetails {
     @PreUpdate
     public void preModify(){
         this.updatedAt = LocalDateTime.now();
+    }
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+       return List.of(new SimpleGrantedAuthority("ROLE_DEFAULE"));
     }
     
 }

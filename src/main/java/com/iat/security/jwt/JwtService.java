@@ -16,7 +16,9 @@ import org.springframework.stereotype.Service;
 import com.iat.security.exception.BussinessRuleException;
 import com.iat.security.exception.ServiceException;
 import com.iat.security.model.Usuario;
+import com.iat.security.model.UsuarioRol;
 import com.iat.security.repository.IUsuarioRepository;
+import com.iat.security.repository.IUsuarioRolRepository;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -32,6 +34,7 @@ public class JwtService implements Serializable  {
     private static final long serialVersionUID = -2550185165626007488L;
 
     private final IUsuarioRepository iUsuarioRepository;
+    private final IUsuarioRolRepository iUsuarioRolRepository;
     
     @Value("${token.signing.key}")
     private String jwtSigningKey;
@@ -42,10 +45,13 @@ public class JwtService implements Serializable  {
 
     public String generateToken(UserDetails user) {
         Usuario usuario = iUsuarioRepository.findByUsername(user.getUsername()).get();
+        List<UsuarioRol> rols = iUsuarioRolRepository.findRolsByUsuarioId(usuario.getIdUsuario());
+        List<String> lstRolsNames = rols.stream().map(r -> r.getRol().getName()).toList();
 
         Long idUsuario = usuario.getIdUsuario();
 
-        List<String> roles  = List.of("RELE_ADMIN");
+        //List<String> roles  = List.of("RELE_ADMIN");
+        List<String> roles  =lstRolsNames;
         Map<String,Object> extraClaims = new HashMap<>();
         extraClaims.put("authorities", roles);
         extraClaims.put("idUser", idUsuario.toString());
@@ -55,6 +61,7 @@ public class JwtService implements Serializable  {
     }
 
     private String generateToken(Map<String,Object> extraClaims, UserDetails user) {
+        
         return Jwts
             .builder()
             .setClaims(extraClaims)

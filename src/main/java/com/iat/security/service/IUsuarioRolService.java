@@ -7,4 +7,6 @@ import com.iat.security.model.UsuarioRol;
 
 public interface IUsuarioRolService extends IBaseInterfaceService<UsuarioRol,Long>{
     List<UsuarioRol> findByUsuarioId(Long id);
+
+    List<UsuarioRol> findRolsByUsuarioId(Long idUsuario);
 }

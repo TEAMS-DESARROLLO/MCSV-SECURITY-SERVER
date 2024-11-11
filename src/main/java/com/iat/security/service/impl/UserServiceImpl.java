@@ -80,7 +80,7 @@ public class UserServiceImpl implements IUserService {
 
             usuarioRolesActualizados.add(usuarioRol.getId());
         }
-        user.setRoles(usuarioRolesActualizados);
+        //user.setRoles(usuarioRolesActualizados);
         return user;
        
     }
@@ -112,7 +112,7 @@ public class UserServiceImpl implements IUserService {
             usuarioRolesActualizados.add(usuarioRol.getId());
         }
 
-        user.setRoles(usuarioRolesActualizados);
+        //user.setRoles(usuarioRolesActualizados);
         return user;
     }
 

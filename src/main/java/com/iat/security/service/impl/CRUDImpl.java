@@ -10,11 +10,12 @@ import com.iat.security.commons.IBaseInterfaceService;
 import com.iat.security.commons.SortModel;
 import com.iat.security.exception.ModelNotFoundException;
 import com.iat.security.exception.RepositoryException;
+import com.iat.security.repository.IGenericRepository;
 
 
 public abstract class CRUDImpl<T,ID> implements IBaseInterfaceService<T,ID>  {
 
-    protected abstract com.iat.security.repository.IGenericRepository<T,ID> getRepositorio();
+    protected abstract IGenericRepository<T,ID> getRepositorio();
 
     @Override
     public Long count() {

@@ -43,7 +43,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
             .username(request.getUsername())
             .password(passwordEncoder.encode( request.getPassword()))
             .nombres(request.getFirstName() )
-            .role(Role.USER)
+            //.role(Role.USER)
             .build();
 
         Usuario o = userRepository.save(user);
@@ -69,7 +69,13 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         if (user.getExpirationDate() != null && today.isAfter(user.getExpirationDate())) {
             throw new AuthenticationFailedException("La cuenta ha expirado.");
         }
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+        UsernamePasswordAuthenticationToken userAuthenticacion = new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
+        try {
+            authenticationManager.authenticate(userAuthenticacion);
+            
+        } catch (Exception e) {
+            throw new AuthenticationFailedException("Invalid user or password.");
+        }
 
         String jwt = jwtService.generateToken(user);
         jwt = "Bearer " + jwt;

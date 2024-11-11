@@ -2,6 +2,7 @@ package com.iat.security.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.iat.security.dto.UserRolDto;
 import com.iat.security.model.UsuarioRol;
@@ -16,5 +17,12 @@ public interface IUsuarioRolRepository  extends IGenericRepository<UsuarioRol,Lo
         WHERE u.idUsuario = :idUsuario
          """)
     List<UserRolDto> findUserRolByUserId(Long idUsuario);
+
+    @Query("""
+        SELECT ur FROM UsuarioRol ur WHERE ur.usuario.idUsuario = :idUsuario
+         """)
+    List<UsuarioRol> findRolsByUsuarioId(@Param("idUsuario")  Long idUsuario);
+
+
 
 }

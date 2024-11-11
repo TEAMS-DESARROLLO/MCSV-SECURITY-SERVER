@@ -12,7 +12,7 @@ ENV JAVA_OPTS  "-Dspring.profiles.active=mcsv-developer.yml"
 ENV EUREKA_SERVER="http://mcsv-eureka-server:8761/eureka"
 
 EXPOSE $PORT
-COPY *.jar /app/security-server-1.0.1.jar 
+COPY /target/*.jar /app/security-server-1.0.1.jar 
 # ENTRYPOINT ["java ${JAVA_OPTS}","-jar","/app/security-server-1.0.1.jar"]
 # ENTRYPOINT ["java",$JAVA_OPTS,"-jar","/app/security-server-1.0.1.jar","--eureka.client.serviceUrl.defaultZone=${EUREKA_SERVER}"]
 ENTRYPOINT exec java $JAVA_OPTS -jar /app/security-server-1.0.1.jar --eureka.client.serviceUrl.defaultZone=${EUREKA_SERVER}

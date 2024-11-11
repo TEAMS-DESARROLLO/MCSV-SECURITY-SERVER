@@ -35,9 +35,9 @@ public class UserMapper {
         if(user==null) return null;
 
         List<Long> roles = new ArrayList<>();
-       if(user.getRoles() != null ){
-        roles = new ArrayList(user.getRoles());
-    }
+        // if(user.getRoles() != null ){
+        //     roles = new ArrayList();
+        // }
 
         return UserResponseDto.builder()
                             .idUsuario(user.getIdUsuario())
@@ -79,7 +79,7 @@ public class UserMapper {
                             .mapToLong(userRol -> userRol.getIdRol())
                             .boxed() 
                             .collect(Collectors.toSet());
-        usuario.setRoles(roles);
+        //usuario.setRoles(roles);
         usuario.setFile(userRolBase.getFile());
         usuario.setFilename(userRolBase.getFilename());
         return usuario;
