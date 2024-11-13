@@ -17,6 +17,7 @@ import com.iat.security.dto.UserListResponseDto;
 import com.iat.security.dto.UserRequestDto;
 import com.iat.security.dto.UserResponseDto;
 import com.iat.security.mapper.UserMapper;
+import com.iat.security.model.Usuario;
 import com.iat.security.service.IUserService;
 import com.iat.security.service.impl.UsuarioPaginationService;
 
@@ -36,7 +37,10 @@ public class UsuarioController {
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDto> findById(@PathVariable("id") Long id) {
-        UserResponseDto userResponseDto = UserMapper.fromEntity(this.iUserService.findById(id));
+        // Usuario usuario = this.iUserService.findById(id);
+        // UserResponseDto userResponseDto = UserMapper.fromEntity(usuario);
+
+        UserResponseDto userResponseDto =iUserService.getUserResponseDto(id);
         return new ResponseEntity<>(userResponseDto, HttpStatus.OK);
     }
     
@@ -49,6 +53,7 @@ public class UsuarioController {
 
     @PutMapping("/update/{id}")
     public ResponseEntity<UserResponseDto> update(@PathVariable Long id, @RequestBody UserRequestDto entity) {
+        Usuario usuario = iUserService.updateUsuario(id,entity);
         UserResponseDto user = UserMapper.fromEntity(iUserService.updateUsuario(id,entity));
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
