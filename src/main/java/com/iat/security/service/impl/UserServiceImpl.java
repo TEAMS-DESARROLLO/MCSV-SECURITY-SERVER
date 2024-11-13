@@ -3,6 +3,7 @@ package com.iat.security.service.impl;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -13,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.iat.security.dto.UserRequestDto;
+import com.iat.security.dto.UserResponseDto;
 import com.iat.security.dto.UserRolDto;
 import com.iat.security.exception.ConflictException;
 import com.iat.security.exception.ModelNotFoundException;
@@ -94,7 +96,7 @@ public class UserServiceImpl implements IUserService {
 
         userBusinessService.update(user, idUser);
         
-        List<UsuarioRol> usuarioRolesActuales = usuarioRolService.findByUsuarioId(idUser);
+        List<UsuarioRol> usuarioRolesActuales = usuarioRolService.findRolsByUsuarioId(idUser);
 
         Set<Long> usuarioRolesActualizados = new HashSet<>();
 
@@ -132,7 +134,9 @@ public class UserServiceImpl implements IUserService {
         if( !userRolesDTO.isEmpty() ){
             usuario = UserMapper.fromRolesDtoToUser(userRolesDTO);
         }
-        
+
+
+
         return usuario;
     }
 
@@ -142,6 +146,37 @@ public class UserServiceImpl implements IUserService {
         user.setStatusUser(request.getStatusUser());
         userBusinessService.update(user, idUser);
         return user;
+    }
+
+    @Override
+    public UserResponseDto getUserResponseDto(Long idUser) {
+
+        List<UserRolDto> userRolesDTO =  usuarioRolRepository.findUserRolByUserId(idUser);
+        if( userRolesDTO == null ){
+            throw new ModelNotFoundException("No hay roles relacionado al usuario id : "+idUser);
+        }
+
+
+        UserRolDto userRolDto = userRolesDTO.get(0);
+
+        // crear un lamba que itere por userRolDto, y me genere una lista de roles
+        List<Long> roles = userRolesDTO.stream().map(UserRolDto::getIdRol).collect(Collectors.toList());
+        
+        //crear una variable de UserResponseDto asignar los valores de userRolDto y en la propiedad roles asignar la lista de roles
+        UserResponseDto userResponseDto = UserResponseDto.builder()
+                .idUsuario(userRolDto.getIdUsuario())
+                .username(userRolDto.getUsername())
+                .nombres(userRolDto.getNombres())
+                .registrationStatus(userRolDto.getRegistrationStatus())
+                .statusUser(userRolDto.getStatusUser())
+                .expirationDate(userRolDto.getExpirationDate())
+                .roles(roles)
+                .file(userRolDto.getFile())
+                .filename(userRolDto.getFilename())
+                .build();        
+
+        return userResponseDto;
+
     }
 
 }
